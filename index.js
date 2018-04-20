@@ -4,9 +4,21 @@
  See README.md for details.
 */
 
-var Service, Characteristic, types;
+//var Service, Characteristic, types;
 
 var isy = require('isy-js');
+
+
+var HAPI = require('homebridge');
+import {
+	Service,
+	Accessory,
+	Characteristic
+} from 'hap-nodejs';
+import {
+	types
+} from 'homebridge';
+import { } from '../isy-js/isydevice';
 
 // Global device map. Needed to map incoming notifications to the corresponding HomeKit device for update.
 var deviceMap = {};
@@ -22,9 +34,11 @@ function ISYChangeHandler(isy, device) {
 }
 
 module.exports = function (homebridge) {
+
 	Service = homebridge.hap.Service;
 	Characteristic = homebridge.hap.Characteristic;
 	types = homebridge.hapLegacyTypes;
+
 	homebridge.registerPlatform("homebridge-isy-js", "isy-js", ISYPlatform);
 }
 
@@ -196,12 +210,6 @@ class ISYPlatform {
 	}
 }
 
-
-
-
-
-
-
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // BASE FOR ALL DEVICES
 
@@ -217,9 +225,10 @@ function ISYAccessoryBaseSetup(accessory, log, device) {
 
 }
 
-class ISYBaseAccessory {
+class ISYBaseAccessory extends Accessory {
 	constructor(log, device) {
 		ISYAccessoryBaseSetup(this, log, device);
+		
 	}
 	getServices() {
 		var informationService = new Service.AccessoryInformation();
@@ -427,6 +436,10 @@ class ISYFanAccessory extends ISYBaseAccessory {
 			callback();
 		}
 	}
+
+	getLightOnState()
+	
+
 	// Returns true if the fan is on
 	getIsFanOn() {
 		this.log("FAN: " + this.device.name + " Getting fan is on. Device says: " + this.device.getCurrentFanState() + " Code says: " + (this.device.getCurrentFanState() != "Off"));
@@ -452,6 +465,52 @@ class ISYFanAccessory extends ISYBaseAccessory {
 			callback();
 		}
 	}
+
+	setPowerState(powerOn, callback) {
+		this.log("LIGHT: " + this.device.name + " Setting powerstate to " + powerOn);
+		if (powerOn != this.device.getCurrentLightState()) {
+			this.log("LIGHT: " + this.device.name + " Changing powerstate to " + powerOn);
+			this.device.sendLightCommand(powerOn, function (result) {
+				callback();
+			});
+		} else {
+			this.log("LIGHT: " + this.device.name + " Ignoring redundant setPowerState");
+			callback();
+		}
+	}
+	// Mirrors change in the state of the underlying isj-js device object.
+	handleExternalChange() {
+		
+	}
+	// Handles request to get the current on state
+	getPowerState(callback) {
+		callback(null, this.device.getCurrentLightState());
+	}
+	// Handles request to set the brightness level of dimmable lights. Ignore redundant commands. 
+	setBrightness(level, callback) {
+		this.log("LIGHT: " + this.device.name + " Setting brightness to " + level);
+		if (level != this.device.getCurrentLightDimState()) {
+			if (level == 0) {
+				this.log("LIGHT: " + this.device.name + " Brightness set to 0, sending off command");
+				this.device.sendLightCommand(false, function (result) {
+					callback();
+				});
+			} else {
+				this.log("LIGHT: " + this.device.name + " Changing Brightness to " + level);
+				this.device.sendLightDimCommand(level, function (result) {
+					callback();
+				});
+			}
+		} else {
+			this.log("LIGHT: " + this.device.name + " Ignoring redundant setBrightness");
+			callback();
+		}
+	}
+	// Handles a request to get the current brightness level for dimmable lights.
+	getBrightness(callback) {
+		callback(null, this.device.getCurrentLightDimState());
+	}
+
 	// Mirrors change in the state of the underlying isj-js device object.
 	handleExternalChange() {
 		this.log("FAN: " + this.device.name + " Incoming external change. Device says: " + this.device.getCurrentFanState());
@@ -459,6 +518,13 @@ class ISYFanAccessory extends ISYBaseAccessory {
 			.setCharacteristic(Characteristic.On, this.getIsFanOn());
 		this.fanService
 			.setCharacteristic(Characteristic.RotationSpeed, this.translateFanSpeedToHK(this.device.getCurrentFanState()));
+			this.log("LIGHT: " + this.device.name + " Handling external change for light");
+		this.lightService
+				.updateCharacteristic(Characteristic.On, this.device.getCurrentLightState());
+		if (this.dimmable) {
+				this.lightService
+					.updateCharacteristic(Characteristic.Brightness, this.device.getCurrentLightDimState());
+		}
 	}
 	// Returns the services supported by the fan device. 
 	getServices() {
@@ -803,7 +869,7 @@ class ISYDoorWindowSensorAccessory extends ISYBaseAccessory {
 		super.getServices();
 		var sensorService = new Service.ContactSensor();
 		this.sensorService = sensorService;
-			sensorService
+		sensorService
 			.getCharacteristic(Characteristic.ContactSensorState)
 			.on('get', this.getCurrentDoorWindowState.bind(this));
 		return [this.informationService, sensorService];
@@ -835,7 +901,7 @@ class ISYMotionSensorAccessory extends ISYBaseAccessory {
 	}
 	// Returns the set of services supported by this object.
 	getServices() {
-	
+
 		super.getServices();
 		var sensorService = new Service.MotionSensor();
 		this.sensorService = sensorService;

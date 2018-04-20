@@ -6,7 +6,7 @@
 
 var Service, Characteristic, types;
 
-var isy = require('isy-js');
+var isy = require('../isy-js');
 
 // Global device map. Needed to map incoming notifications to the corresponding HomeKit device for update.
 var deviceMap = {};

@@ -26,18 +26,20 @@
   ],
   "devDependencies": {
     "mocha": "",
-    "fake-isy-994i": ""
+    "fake-isy-994i": "",
+    "hap-nodejs": "",
+    "homebridge": ""
   },
   "dependencies": {
     "restler": "",
     "faye-websocket": "",
     "xmldoc": "",
-    "isy-js": ""
+    "isy-js": "file:../isy-js"
   },
-  "author": "rodtoll",
+  "author": "pradeepmouli",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/rodtoll/homebridge-isy-js/issues"
+    "url": "https://github.com/pradeepmouli/homebridge-isy-js/issues"
   },
-  "homepage": "https://github.com/rodtoll/homebridge-isy-js"
+  "homepage": "https://github.com/pradeepmouli/homebridge-isy-js"
 }
