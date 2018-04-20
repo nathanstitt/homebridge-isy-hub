@@ -4,21 +4,30 @@
  See README.md for details.
 */
 
-//var Service, Characteristic, types;
+var Service, Characteristic, types;
 
 var isy = require('isy-js');
 
 
 var HAPI = require('homebridge');
 import {
-	Service,
-	Accessory,
-	Characteristic
-} from 'hap-nodejs';
+	//Service,
+	Accessory//,
+	//Characteristic
+} from 'hap-nodejs'
 import {
-	types
+	hapLegacyTypes
 } from 'homebridge';
-import { } from '../isy-js/isydevice';
+import {
+	ISYBaseDevice,
+	ISYDoorWindowDevice,
+	ISYFanDevice,
+	ISYLightDevice,
+	ISYLockDevice,
+	ISYMotionSensorDevice,
+	ISYOutletDevice,
+	ISYThermostatDevice
+} from '../isy-js/isydevice';
 
 // Global device map. Needed to map incoming notifications to the corresponding HomeKit device for update.
 var deviceMap = {};
@@ -33,7 +42,7 @@ function ISYChangeHandler(isy, device) {
 	}
 }
 
-module.exports = function (homebridge) {
+module.exports = (homebridge) => {
 
 	Service = homebridge.hap.Service;
 	Characteristic = homebridge.hap.Characteristic;
@@ -165,27 +174,8 @@ class ISYPlatform {
 						relayAddress += '2';
 						var relayDevice = that.isy.getDevice(relayAddress);
 						homeKitDevice = new ISYGarageDoorAccessory(that.logger.bind(that), device, relayDevice, garageInfo.name, garageInfo.timeToOpen, garageInfo.alternate);
-					} else if (device.deviceType == that.isy.DEVICE_TYPE_LIGHT || device.deviceType == that.isy.DEVICE_TYPE_DIMMABLE_LIGHT) {
-						homeKitDevice = new ISYLightAccessory(that.logger.bind(that), device);
-					} else if (device.deviceType == that.isy.DEVICE_TYPE_LOCK || device.deviceType == that.isy.DEVICE_TYPE_SECURE_LOCK) {
-						homeKitDevice = new ISYLockAccessory(that.logger.bind(that), device);
-					} else if (device.deviceType == that.isy.DEVICE_TYPE_OUTLET) {
-						homeKitDevice = new ISYOutletAccessory(that.logger.bind(that), device);
-					} else if (device.deviceType == that.isy.DEVICE_TYPE_FAN) {
-						homeKitDevice = new ISYFanAccessory(that.logger.bind(that), device);
-					} else if (device.deviceType == that.isy.DEVICE_TYPE_DOOR_WINDOW_SENSOR) {
-						homeKitDevice = new ISYDoorWindowSensorAccessory(that.logger.bind(that), device);
-					} else if (device.deviceType == that.isy.DEVICE_TYPE_ALARM_DOOR_WINDOW_SENSOR) {
-						homeKitDevice = new ISYDoorWindowSensorAccessory(that.logger.bind(that), device);
-					} else if (device.deviceType == that.isy.DEVICE_TYPE_ALARM_PANEL) {
-						homeKitDevice = new ISYElkAlarmPanelAccessory(that.logger.bind(that), device);
-					} else if (device.deviceType == that.isy.DEVICE_TYPE_MOTION_SENSOR) {
-						homeKitDevice = new ISYMotionSensorAccessory(that.logger.bind(that), device);
-					} else if (device.deviceType == that.isy.DEVICE_TYPE_SCENE) {
-						homeKitDevice = new ISYSceneAccessory(that.logger.bind(that), device);
-					} else if (device.deviceType == that.isy.DEVICE_TYPE_THERMOSTAT) {
-						homeKitDevice = new ISYThermostatAccessory(that.logger.bind(that), device);
 					}
+					homeKitDevice = this.createAccessory(device);
 					if (homeKitDevice != null) {
 						// Make sure the device is address to the global map
 						deviceMap[device.address] = homeKitDevice;
@@ -208,6 +198,32 @@ class ISYPlatform {
 			callback(results);
 		});
 	}
+
+	createAccessory(device) {
+
+		if (device.deviceType == that.isy.DEVICE_TYPE_LIGHT || device.deviceType == that.isy.DEVICE_TYPE_DIMMABLE_LIGHT) {
+			return new ISYLightAccessory(that.logger.bind(this), device);
+		} else if (device.deviceType == that.isy.DEVICE_TYPE_LOCK || device.deviceType == that.isy.DEVICE_TYPE_SECURE_LOCK) {
+			return new ISYLockAccessory(that.logger.bind(that), device);
+		} else if (device.deviceType == that.isy.DEVICE_TYPE_OUTLET) {
+			return new ISYOutletAccessory(that.logger.bind(that), device);
+		} else if (device.deviceType == that.isy.DEVICE_TYPE_FAN) {
+			return new ISYFanAccessory(that.logger.bind(that), device);
+		} else if (device.deviceType == that.isy.DEVICE_TYPE_DOOR_WINDOW_SENSOR) {
+			return new ISYDoorWindowSensorAccessory(that.logger.bind(that), device);
+		} else if (device.deviceType == that.isy.DEVICE_TYPE_ALARM_DOOR_WINDOW_SENSOR) {
+			return new ISYDoorWindowSensorAccessory(that.logger.bind(that), device);
+		} else if (device.deviceType == that.isy.DEVICE_TYPE_ALARM_PANEL) {
+			return new ISYElkAlarmPanelAccessory(that.logger.bind(that), device);
+		} else if (device.deviceType == that.isy.DEVICE_TYPE_MOTION_SENSOR) {
+			return new ISYMotionSensorAccessory(that.logger.bind(that), device);
+		} else if (device.deviceType == that.isy.DEVICE_TYPE_SCENE) {
+			return new ISYSceneAccessory(that.logger.bind(that), device);
+		} else if (device.deviceType == that.isy.DEVICE_TYPE_THERMOSTAT) {
+			return new ISYThermostatAccessory(that.logger.bind(that), device);
+		}
+		return null;
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -227,8 +243,9 @@ function ISYAccessoryBaseSetup(accessory, log, device) {
 
 class ISYBaseAccessory extends Accessory {
 	constructor(log, device) {
+		super(device.name,device.isy.address + ":" + device.address);
 		ISYAccessoryBaseSetup(this, log, device);
-		
+
 	}
 	getServices() {
 		var informationService = new Service.AccessoryInformation();
@@ -437,8 +454,8 @@ class ISYFanAccessory extends ISYBaseAccessory {
 		}
 	}
 
-	getLightOnState()
-	
+	getLightOnState(){}
+
 
 	// Returns true if the fan is on
 	getIsFanOn() {
@@ -478,10 +495,7 @@ class ISYFanAccessory extends ISYBaseAccessory {
 			callback();
 		}
 	}
-	// Mirrors change in the state of the underlying isj-js device object.
-	handleExternalChange() {
-		
-	}
+	
 	// Handles request to get the current on state
 	getPowerState(callback) {
 		callback(null, this.device.getCurrentLightState());
@@ -518,12 +532,12 @@ class ISYFanAccessory extends ISYBaseAccessory {
 			.setCharacteristic(Characteristic.On, this.getIsFanOn());
 		this.fanService
 			.setCharacteristic(Characteristic.RotationSpeed, this.translateFanSpeedToHK(this.device.getCurrentFanState()));
-			this.log("LIGHT: " + this.device.name + " Handling external change for light");
+		this.log("LIGHT: " + this.device.name + " Handling external change for light");
 		this.lightService
-				.updateCharacteristic(Characteristic.On, this.device.getCurrentLightState());
+			.updateCharacteristic(Characteristic.On, this.device.getCurrentLightState());
 		if (this.dimmable) {
-				this.lightService
-					.updateCharacteristic(Characteristic.Brightness, this.device.getCurrentLightDimState());
+			this.lightService
+				.updateCharacteristic(Characteristic.Brightness, this.device.getCurrentLightDimState());
 		}
 	}
 	// Returns the services supported by the fan device. 
