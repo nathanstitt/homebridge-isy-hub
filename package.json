@@ -6,7 +6,9 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha",
+    "build": "babel index.js -d lib",
     "start": "echo \"Error: configure and run homebridge to start\" && exit 1"
+
   },
   "engines": {
     "node": ">4.0.0",
@@ -25,10 +27,12 @@
     "Siri"
   ],
   "devDependencies": {
-    "mocha": "",
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
     "fake-isy-994i": "",
     "hap-nodejs": "",
-    "homebridge": ""
+    "homebridge": "",
+    "mocha": ""
   },
   "dependencies": {
     "restler": "",
