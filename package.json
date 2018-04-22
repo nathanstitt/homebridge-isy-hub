@@ -6,9 +6,8 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha",
-    "build": "babel index.js -d lib",
+    "build": "babel ./ -d lib",
     "start": "echo \"Error: configure and run homebridge to start\" && exit 1"
-
   },
   "engines": {
     "node": ">4.0.0",
@@ -30,6 +29,7 @@
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "fake-isy-994i": "",
+    "flow": "^0.2.3",
     "hap-nodejs": "",
     "homebridge": "",
     "mocha": ""

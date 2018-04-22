@@ -4,19 +4,19 @@
  See README.md for details.
 */
 
-var Service, Characteristic, types;
+var  Service, Characteristic, types;
 
-var isy = require('isy-js');
+import {isy} from 'isy-js';
 
-
-var HAPI = require('homebridge');
 import {
-	//Service,
-	Accessory//,
-	//Characteristic
-} from 'hap-nodejs'
+	
+	Accessory
+} from 'hap-nodejs';
+
+
 import {
 	hapLegacyTypes
+	
 } from 'homebridge';
 import {
 	ISYBaseDevice,
@@ -27,7 +27,8 @@ import {
 	ISYMotionSensorDevice,
 	ISYOutletDevice,
 	ISYThermostatDevice
-} from '../isy-js/isydevice';
+} from 'isy-js/isydevice';
+
 
 // Global device map. Needed to map incoming notifications to the corresponding HomeKit device for update.
 var deviceMap = {};
@@ -170,7 +171,7 @@ class ISYPlatform {
 					}
 					device.name = that.renameDeviceIfNeeded(device);
 					if (garageInfo != null) {
-						var relayAddress = device.address.substr(0, device.address.length - 1);
+						let relayAddress = device.address.substr(0, device.address.length - 1);
 						relayAddress += '2';
 						var relayDevice = that.isy.getDevice(relayAddress);
 						homeKitDevice = new ISYGarageDoorAccessory(that.logger.bind(that), device, relayDevice, garageInfo.name, garageInfo.timeToOpen, garageInfo.alternate);
@@ -200,13 +201,13 @@ class ISYPlatform {
 	}
 
 	createAccessory(device) {
-
-		if (device.deviceType == that.isy.DEVICE_TYPE_LIGHT || device.deviceType == that.isy.DEVICE_TYPE_DIMMABLE_LIGHT) {
-			return new ISYLightAccessory(that.logger.bind(this), device);
-		} else if (device.deviceType == that.isy.DEVICE_TYPE_LOCK || device.deviceType == that.isy.DEVICE_TYPE_SECURE_LOCK) {
-			return new ISYLockAccessory(that.logger.bind(that), device);
-		} else if (device.deviceType == that.isy.DEVICE_TYPE_OUTLET) {
-			return new ISYOutletAccessory(that.logger.bind(that), device);
+		var that = this;
+		if (device.deviceType == isy.DEVICE_TYPE_LIGHT || device.deviceType == isy.DEVICE_TYPE_DIMMABLE_LIGHT) {
+			return new ISYLightAccessory(this.logger.bind(this), device);
+		} else if (device.deviceType == isy.DEVICE_TYPE_LOCK || device.deviceType == isy.DEVICE_TYPE_SECURE_LOCK) {
+			return new ISYLockAccessory(this.logger.bind(that), device);
+		} else if (device.deviceType == isy.DEVICE_TYPE_OUTLET) {
+			return new ISYOutletAccessory(this.logger.bind(this), device);
 		} else if (device.deviceType == that.isy.DEVICE_TYPE_FAN) {
 			return new ISYFanAccessory(that.logger.bind(that), device);
 		} else if (device.deviceType == that.isy.DEVICE_TYPE_DOOR_WINDOW_SENSOR) {
@@ -308,6 +309,7 @@ class ISYThermostatAccessory extends ISYBaseAccessory {
 
 	// Mirrors change in the state of the underlying isj-js device object.
 	handleExternalChange() {
+		
 		this.log("THERM: " + this.device.name + " Incoming external change. Device says: " + this.device.getCurrentTemperatureState());
 		this.thermostatService
 			.updateCharacteristic(Characteristic.CurrentTemperature, this.toCelsius(this.device.getCurrentTemperatureState()));
@@ -347,6 +349,9 @@ class ISYThermostatAccessory extends ISYBaseAccessory {
 			.getCharacteristic(Characteristic.HeatingThresholdTemperature)
 			.on('get', this.getHeatSetPoint.bind(this));
 		thermostatService
+			.getCharacteristic(Characteristic.HeatingThresholdTemperature)
+			.on('set', this.setHeatSetPoint.bind(this));
+		thermostatService
 			.getCharacteristic(Characteristic.CurrentHeatingCoolingState)
 			.on('get', this.getHeatingCoolingState.bind(this));
 		thermostatService
@@ -378,20 +383,37 @@ class ISYThermostatAccessory extends ISYBaseAccessory {
 			callback();
 		}
 	}
+
+	setHeatSetPoint(temp, callback) {
+		this.log("THERM: " + this.device.name + " Sending command to set heat set point (pre-translate) to: " + temp);
+		var newSetPoint = this.toFahrenheit(temp);
+		this.log("THERM: " + this.device.name + " Sending command to set heat set point to: " + newSetPoint);
+		if (Math.abs(newSetPoint - this.device.getHeatSetPoint()) >= 1) {
+			this.device.sendUpdateHeatSetPointCommand(newSetPoint, (result) => {
+				callback();
+			});
+		} else {
+
+			this.log("THERM: " + this.device.name + " command does not change actual set point");
+			callback();
+		}
+	}
+
+	setHeatingCoolingMode(temp, callback) {
+		this.log("THERM: " + this.device.name + " Sending command to set cool set point (pre-translate) to: " + temp);
+		var newSetPoint = this.toFahrenheit(temp);
+		this.log("THERM: " + this.device.name + " Sending command to set cool set point to: " + newSetPoint);
+		if (Math.abs(newSetPoint - this.device.getCoolSetPoint()) >= 1) {
+			this.device.sendUpdateHeatingCoolingModeCommand(newSetPoint, (result) => {
+				callback();
+			});
+		} else {
+
+			this.log("THERM: " + this.device.name + " command does not change actual set point");
+			callback();
+		}
+	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 class ISYFanAccessory extends ISYBaseAccessory {
 	constructor(log, device) {
@@ -405,18 +427,21 @@ class ISYFanAccessory extends ISYBaseAccessory {
 	// Homekit doesn't have steps for the fan speed and needs to have a value from 0 to 100. We 
 	// split the range into 4 steps and map them to the 4 isy-js levels. 
 	translateFanSpeedToHK(fanSpeed) {
-		if (fanSpeed == this.device.FAN_OFF) {
-			return 0;
-		} else if (fanSpeed == this.device.FAN_LEVEL_LOW) {
-			return 32;
-		} else if (fanSpeed == this.device.FAN_LEVEL_MEDIUM) {
-			return 75;
-		} else if (fanSpeed == this.device.FAN_LEVEL_HIGH) {
-			return 100;
-		} else {
-			this.log("FAN: " + this.device.name + " !!!! ERROR: Unknown fan speed: " + fanSpeed);
-			return 0;
+		switch (fanSpeed)
+		{
+			case this.device.FAN_OFF:
+				return 0;
+			case this.device.FAN_LEVEL_LOW:
+				return 32;
+			case this.device.FAN_LEVEL_MEDIUM: 
+				return 75;
+			case this.device.FAN_LEVEL_HIGH:
+				return 100;
+			default:
+				this.log("FAN: " + this.device.name + " !!!! ERROR: Unknown fan speed: " + fanSpeed);
+				return 0;
 		}
+
 	}
 	// Translates the fan level from homebridge into the isy-js level. Maps from the 0-100
 	// to the four isy-js fan speed levels. 
@@ -425,7 +450,7 @@ class ISYFanAccessory extends ISYBaseAccessory {
 			return this.device.FAN_OFF;
 		} else if (fanStateHK > 0 && fanStateHK <= 32) {
 			return this.device.FAN_LEVEL_LOW;
-		} else if (fanStateHK >= 33 && fanStateHK <= 67) {
+		} else if (fanStateHK >= 33 && fanStateHK <= 75) {
 			return this.device.FAN_LEVEL_MEDIUM;
 		} else if (fanStateHK > 75) {
 			return this.device.FAN_LEVEL_HIGH;
@@ -544,7 +569,7 @@ class ISYFanAccessory extends ISYBaseAccessory {
 	getServices() {
 		super.getServices();
 		var fanService = new Service.Fan();
-		var lightService = new Service.Lightbulb();
+		var lightService =
 		this.fanService = fanService;
 		this.lightService = lightService;
 		fanService
@@ -559,19 +584,10 @@ class ISYFanAccessory extends ISYBaseAccessory {
 		fanService
 			.getCharacteristic(Characteristic.RotationSpeed)
 			.on('set', this.setFanRotationSpeed.bind(this));
-		return [this.informationService, fanService, lightService];
+		
+		return [this.informationService, fanService];
 	}
 }
-
-
-
-
-
-
-
-
-
-
 
 class ISYOutletAccessory extends ISYBaseAccessory {
 	constructor(log, device) {
@@ -1027,7 +1043,7 @@ class ISYElkAlarmPanelAccessory extends ISYBaseAccessory {
 		super.getServices();
 		var alarmPanelService = new Service.SecuritySystem();
 		this.alarmPanelService = alarmPanelService;
-		this.informationService = informationService;
+	
 		alarmPanelService
 			.getCharacteristic(Characteristic.SecuritySystemTargetState)
 			.on('set', this.setAlarmTargetState.bind(this));
@@ -1037,7 +1053,7 @@ class ISYElkAlarmPanelAccessory extends ISYBaseAccessory {
 		alarmPanelService
 			.getCharacteristic(Characteristic.SecuritySystemCurrentState)
 			.on('get', this.getAlarmCurrentState.bind(this));
-		return [informationService, alarmPanelService];
+		return [this.informationService, alarmPanelService];
 	}
 }
 
