@@ -55,7 +55,7 @@ module.exports = (homebridge) => {
 	Characteristic = homebridge.hap.Characteristic;
 	types = homebridge.hapLegacyTypes;
 
-	homebridge.registerPlatform(`homebridge-isy-js`, "isy-js", ISYPlatform);
+	homebridge.registerPlatform("homebridge-isy-js", "isy-js", ISYPlatform);
 };
 
 class ISYPlatform {
