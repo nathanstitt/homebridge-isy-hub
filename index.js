@@ -4,19 +4,23 @@
  See README.md for details.
 */
 
-var  Service, Characteristic, types;
 
-import {isy} from 'isy-js';
+
+var Service, Characteristic, types;
+
+import {ISY} from 'isy-js';
 
 import {
+	//Characteristic,
+	//Service,
+	Accessory,
+
 	
-	Accessory
 } from 'hap-nodejs';
 
 
 import {
 	hapLegacyTypes
-	
 } from 'homebridge';
 import {
 	ISYBaseDevice,
@@ -28,6 +32,8 @@ import {
 	ISYOutletDevice,
 	ISYThermostatDevice
 } from 'isy-js/isydevice';
+import { CURRENTHEATINGCOOLING_CTYPE } from 'hap-nodejs/accessories/types';
+import { ISYScene } from 'isy-js/isyscene';
 
 
 // Global device map. Needed to map incoming notifications to the corresponding HomeKit device for update.
@@ -45,14 +51,16 @@ function ISYChangeHandler(isy, device) {
 
 module.exports = (homebridge) => {
 
-	Service = homebridge.hap.Service;
-	Characteristic = homebridge.hap.Characteristic;
+	//Service = homebridge.hap.Service;
+	//Characteristic = homebridge.hap.Characteristic;
 	types = homebridge.hapLegacyTypes;
 
-	homebridge.registerPlatform("homebridge-isy-js", "isy-js", ISYPlatform);
-}
+	homebridge.registerPlatform(`homebridge-isy-js`, "isy-js", ISYPlatform);
+};
 
 class ISYPlatform {
+
+
 	constructor(log, config) {
 		this.log = log;
 		this.config = config;
@@ -63,8 +71,9 @@ class ISYPlatform {
 		this.debugLoggingEnabled = (config.debugLoggingEnabled == undefined) ? false : config.debugLoggingEnabled;
 		this.includeAllScenes = (config.includeAllScenes == undefined) ? false : config.includeAllScenes;
 		this.includedScenes = (config.includedScenes == undefined) ? [] : config.includedScenes;
-		this.isy = new isy.ISY(this.host, this.username, this.password, config.elkEnabled, ISYChangeHandler, config.useHttps, true, this.debugLoggingEnabled);
+		this.isy = new ISY(this.host, this.username, this.password, config.elkEnabled, ISYChangeHandler, config.useHttps, true, this.debugLoggingEnabled);
 	}
+
 	logger(msg) {
 		if (this.debugLoggingEnabled || (process.env.ISYJSDEBUG != undefined && process.env.IYJSDEBUG != null)) {
 			var timeStamp = new Date();
@@ -86,8 +95,8 @@ class ISYPlatform {
 				return false;
 			}
 			var deviceName = device.name;
-			for (var index = 0; index < this.config.ignoreDevices.length; index++) {
-				var rule = this.config.ignoreDevices[index];
+			for (var rule in this.config.ignoreDevices) {
+			
 				if (rule.nameContains != undefined && rule.nameContains != "") {
 					if (deviceName.indexOf(rule.nameContains) == -1) {
 						continue;
@@ -202,25 +211,25 @@ class ISYPlatform {
 
 	createAccessory(device) {
 		var that = this;
-		if (device.deviceType == isy.DEVICE_TYPE_LIGHT || device.deviceType == isy.DEVICE_TYPE_DIMMABLE_LIGHT) {
+		if (device instanceof ISYLightDevice) {
 			return new ISYLightAccessory(this.logger.bind(this), device);
-		} else if (device.deviceType == isy.DEVICE_TYPE_LOCK || device.deviceType == isy.DEVICE_TYPE_SECURE_LOCK) {
+		} else if (device instanceof ISYLockDevice) {
 			return new ISYLockAccessory(this.logger.bind(that), device);
-		} else if (device.deviceType == isy.DEVICE_TYPE_OUTLET) {
+		} else if (device instanceof ISYOutletDevice) {
 			return new ISYOutletAccessory(this.logger.bind(this), device);
-		} else if (device.deviceType == that.isy.DEVICE_TYPE_FAN) {
+		} else if (device instanceof ISYFanDevice) {
 			return new ISYFanAccessory(that.logger.bind(that), device);
-		} else if (device.deviceType == that.isy.DEVICE_TYPE_DOOR_WINDOW_SENSOR) {
+		} else if (device instanceof ISYDoorWindowDevice) {
 			return new ISYDoorWindowSensorAccessory(that.logger.bind(that), device);
 		} else if (device.deviceType == that.isy.DEVICE_TYPE_ALARM_DOOR_WINDOW_SENSOR) {
 			return new ISYDoorWindowSensorAccessory(that.logger.bind(that), device);
 		} else if (device.deviceType == that.isy.DEVICE_TYPE_ALARM_PANEL) {
 			return new ISYElkAlarmPanelAccessory(that.logger.bind(that), device);
-		} else if (device.deviceType == that.isy.DEVICE_TYPE_MOTION_SENSOR) {
+		} else if (device instanceof ISYMotionSensorDevice) {
 			return new ISYMotionSensorAccessory(that.logger.bind(that), device);
-		} else if (device.deviceType == that.isy.DEVICE_TYPE_SCENE) {
+		} else if (device instanceof ISYScene) {
 			return new ISYSceneAccessory(that.logger.bind(that), device);
-		} else if (device.deviceType == that.isy.DEVICE_TYPE_THERMOSTAT) {
+		} else if (device instanceof ISYThermostatDevice) {
 			return new ISYThermostatAccessory(that.logger.bind(that), device);
 		}
 		return null;
@@ -232,20 +241,22 @@ class ISYPlatform {
 
 // Provides common constructor tasks
 function ISYAccessoryBaseSetup(accessory, log, device) {
-	accessory.log = log;
+	accessory.log = (msg) => log(typeof(accessory)+": "+msg);
 	accessory.device = device;
 	accessory.address = device.address;
 	accessory.name = device.name;
-
+	
 	accessory.uuid_base = device.isy.address + ":" + device.address;
 
 
 }
 
-class ISYBaseAccessory extends Accessory {
+class ISYBaseAccessory /*extends Accessory*/ {
 	constructor(log, device) {
-		super(device.name,device.isy.address + ":" + device.address);
 		ISYAccessoryBaseSetup(this, log, device);
+		
+		//super(this.name,homebridge.hap.generateUUID(this.uuid_base));
+		
 
 	}
 	getServices() {
@@ -261,6 +272,7 @@ class ISYBaseAccessory extends Accessory {
 class ISYThermostatAccessory extends ISYBaseAccessory {
 	constructor(log, device) {
 		super(log, device);
+		
 	}
 	identify(callback) {
 		// Do the identify action
@@ -341,7 +353,7 @@ class ISYThermostatAccessory extends ISYBaseAccessory {
 			.on('get', this.getCurrentTemperature.bind(this));
 		thermostatService
 			.getCharacteristic(Characteristic.CoolingThresholdTemperature)
-			.on('get', this.getCoolSetPoint.bind(this))
+			.on('get', this.getCoolSetPoint.bind(this));
 		thermostatService
 			.getCharacteristic(Characteristic.CoolingThresholdTemperature)
 			.on('set', this.setCoolSetPoint.bind(this));
@@ -399,12 +411,13 @@ class ISYThermostatAccessory extends ISYBaseAccessory {
 		}
 	}
 
-	setHeatingCoolingMode(temp, callback) {
-		this.log("THERM: " + this.device.name + " Sending command to set cool set point (pre-translate) to: " + temp);
-		var newSetPoint = this.toFahrenheit(temp);
-		this.log("THERM: " + this.device.name + " Sending command to set cool set point to: " + newSetPoint);
-		if (Math.abs(newSetPoint - this.device.getCoolSetPoint()) >= 1) {
-			this.device.sendUpdateHeatingCoolingModeCommand(newSetPoint, (result) => {
+	setHeatingCoolingMode(mode, callback) {
+		this.log("THERM: " + this.device.name + " Sending command to set heating/cooling mode (pre-translate) to: " + mode);
+		
+		//this.log("THERM: " + this.device.name + " Sending command to set cool set point to: " + newSetPoint);
+		if (mode != this.device.getHeatingCoolingMode()) {
+			
+			this.device.sendUpdateHeatingCoolingModeCommand(mode, (result) => {
 				callback();
 			});
 		} else {
@@ -557,13 +570,13 @@ class ISYFanAccessory extends ISYBaseAccessory {
 			.setCharacteristic(Characteristic.On, this.getIsFanOn());
 		this.fanService
 			.setCharacteristic(Characteristic.RotationSpeed, this.translateFanSpeedToHK(this.device.getCurrentFanState()));
-		this.log("LIGHT: " + this.device.name + " Handling external change for light");
-		this.lightService
-			.updateCharacteristic(Characteristic.On, this.device.getCurrentLightState());
-		if (this.dimmable) {
-			this.lightService
-				.updateCharacteristic(Characteristic.Brightness, this.device.getCurrentLightDimState());
-		}
+		// this.log("LIGHT: " + this.device.name + " Handling external change for light");
+		// this.lightService
+		// 	.updateCharacteristic(Characteristic.On, this.device.getCurrentLightState());
+		// if (this.dimmable) {
+		// 	this.lightService
+		// 		.updateCharacteristic(Characteristic.Brightness, this.device.getCurrentLightDimState());
+		// }
 	}
 	// Returns the services supported by the fan device. 
 	getServices() {
@@ -1240,18 +1253,6 @@ class ISYGarageDoorAccessory extends ISYBaseAccessory {
 		return [this.informationService, garageDoorService];
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 module.exports.platform = ISYPlatform;
 module.exports.ISYFanAccessory = ISYFanAccessory;

@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha",
-    "build": "babel ./ -d lib",
+    "build": "babel index.js -d lib",
     "start": "echo \"Error: configure and run homebridge to start\" && exit 1"
   },
   "engines": {
