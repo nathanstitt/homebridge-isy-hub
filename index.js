@@ -32,7 +32,7 @@ import {
 	ISYOutletDevice,
 	ISYThermostatDevice
 } from 'isy-js/isydevice';
-import { CURRENTHEATINGCOOLING_CTYPE } from 'hap-nodejs/accessories/types';
+
 import { ISYScene } from 'isy-js/isyscene';
 
 
@@ -51,8 +51,8 @@ function ISYChangeHandler(isy, device) {
 
 module.exports = (homebridge) => {
 
-	//Service = homebridge.hap.Service;
-	//Characteristic = homebridge.hap.Characteristic;
+	Service = homebridge.hap.Service;
+	Characteristic = homebridge.hap.Characteristic;
 	types = homebridge.hapLegacyTypes;
 
 	homebridge.registerPlatform(`homebridge-isy-js`, "isy-js", ISYPlatform);
