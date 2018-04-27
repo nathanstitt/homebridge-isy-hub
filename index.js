@@ -13,7 +13,7 @@ import {ISY} from 'isy-js';
 import {
 	//Characteristic,
 	//Service,
-	Accessory,
+	Accessory
 
 	
 } from 'hap-nodejs';
