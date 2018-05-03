@@ -4,7 +4,7 @@
  See README.md for details.
 */
 
-var Service, Characteristic, types;
+var Service,Characteristic, types;
 
 import { ISY } from "isy-js";
 
@@ -13,6 +13,7 @@ import {
   //Service,
   Accessory
 } from "hap-nodejs";
+
 
 import { hapLegacyTypes } from "homebridge";
 import {
@@ -195,8 +196,8 @@ class ISYPlatform {
     this.isy.initialize(() => {
       var results = [];
       var deviceList = that.isy.getDeviceList();
-      for (var index = 0; index < deviceList.length; index++) {
-        var device = deviceList[index];
+      for (var device of deviceList) {
+       
         var homeKitDevice = null;
         var garageInfo = that.getGarageEntry(device.address);
         if (!that.shouldIgnore(device)) {
