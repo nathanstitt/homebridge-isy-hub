@@ -4,21 +4,37 @@
  See README.md for details.
 */
 
-var  Service,Characteristic, types;
+var Service, Characteristic, types;
 
-import { ISY } from "isy-js";
+import {
+	ISY
+} from "isy-js";
 
 import {
 	//Characteristic,
-  //Service,
-  //Service,
+	//Service,
+	//Service,
 	Accessory
 } from "hap-nodejs";
 import * as HAP from "hap-nodejs";
-import { hapLegacyTypes } from "homebridge";
-import { ISYBaseDevice, ISYDoorWindowDevice, ISYFanDevice, ISYLightDevice, ISYLockDevice, ISYMotionSensorDevice, ISYOutletDevice, ISYThermostatDevice } from "isy-js/isydevice";
+import {
+	hapLegacyTypes
+} from "homebridge";
+import {
+	ISYBaseDevice,
+	ISYDoorWindowDevice,
+	ISYFanDevice,
+	ISYLightDevice,
+	ISYLockDevice,
+	ISYMotionSensorDevice,
+	ISYOutletDevice,
+	ISYThermostatDevice
+} from "isy-js/isydevice";
 
-import { ISYScene } from "isy-js/isyscene";
+import {
+	ISYScene
+} from "isy-js/isyscene";
+
 
 // Global device map. Needed to map incoming notifications to the corresponding HomeKit device for update.
 var deviceMap = {};
@@ -37,7 +53,7 @@ module.exports = homebridge => {
 	Service = homebridge.hap.Service;
 	Characteristic = homebridge.hap.Characteristic;
 	types = homebridge.hapLegacyTypes;
-  
+
 	homebridge.registerPlatform("homebridge-isy-js", "isy-js", ISYPlatform);
 };
 
@@ -92,7 +108,7 @@ class ISYPlatform {
 						continue;
 					}
 				}
-				this.logger(`ISYPLATFORM: Ignoring device: ${deviceName} [${deviceAddress}] because of rule [${rule.nameContains}] [${rule.lastAddressDigit}] [${rule.address}]`);
+				this.logger('ISYPLATFORM: Ignoring device: ' + deviceName + ' [' + deviceAddress + '] because of rule [' + rule.nameContains + '] [' + rule.lastAddressDigit + '] [' + rule.address + ']');
 				return true;
 			}
 		}
@@ -219,19 +235,19 @@ class ISYPlatform {
 
 // Provides common constructor tasks
 function ISYAccessoryBaseSetup(accessory, log, device) {
-	accessory.log = msg => log(typeof accessory + ": " + msg);
+	accessory.log = msg => log(device.name + ": " + msg);
 	accessory.device = device;
 	accessory.address = device.address;
 	accessory.name = device.name;
-
 	accessory.uuid_base = device.isy.address + ":" + device.address;
+	console.log(accessory.uuid_base);
 }
 
-class ISYBaseAccessory /*extends Accessory*/ {
+class ISYBaseAccessory /*extends /*Accessory*/ {
 	constructor(log, device) {
 		ISYAccessoryBaseSetup(this, log, device);
 
-		//super(this.name,homebridge.hap.generateUUID(this.uuid_base));
+		////uper(this.name,homebridge.hap.generateUUID(this.uuid_base));
 	}
 	getServices() {
 		var informationService = new Service.AccessoryInformation();
@@ -246,6 +262,7 @@ class ISYBaseAccessory /*extends Accessory*/ {
 class ISYThermostatAccessory extends ISYBaseAccessory {
 	constructor(log, device) {
 		super(log, device);
+		
 	}
 	identify(callback) {
 		// Do the identify action
@@ -268,29 +285,32 @@ class ISYThermostatAccessory extends ISYBaseAccessory {
 			`THERM: ${this.device.name} Getting Current Temperature - Device says: ${this.device.getCurrentTemperatureState()} translation says: ${this.toCelsius(this.device.getCurrentTemperatureState())}`
 		);
 		callback(null, this.toCelsius(this.device.getCurrentTemperatureState()));
-  }
-  
-  calcTargetTemperature()
-  {
-    let heatSetPoint = this.device.getHeatSetPoint();
-    let coolSetPoint = this.device.getCoolSetPoint();
-    let currentTemperature = this.device.getCurrentTemperature();
-    if(currentTemperature > heatSetPoint)
-      if(currentTemperature <= coolSetPoint)
-        return currentTemperature;
-      else
-        return coolSetPoint;
-    else (currentTemperature <= heatSetPoint)
-      return heatSetPoint;
-  }
+	}
 
-  
 
-  getTargetTemperature(callback) {
+	initTargetTemperature() {
+		
+		let heatSetPoint = this.device.getHeatSetPoint();
+		let coolSetPoint = this.device.getCoolSetPoint();
+		let currentTemperature = this.device.getCurrentTemperatureState();
+		if (currentTemperature >= heatSetPoint && currentTemperature <= coolSetPoint)
+			this.targetTemperature = this.toCelsius(currentTemperature);
+		else if(currentTemperature < heatSetPoint)
+			this.targetTemperature = this.toCelsius(heatSetPoint);
+		else if (currentTemperature > coolSetPoint)
+			this.targetTemperature = this.toCelsius(coolSetPoint);
+		else
+			this.log('Cannot set target temperature - unhandled scenario.');
+	}
+
+	getTargetTemperature(callback) {
 		this.log(
-			`THERM: ${this.device.name} Getting Current Temperature - Device says: ${this.device.getCurrentTemperatureState()} translation says: ${this.toCelsius(this.device.getCurrentTemperatureState())}`
-    );
-		callback(null, this.toCelsius(this.calcTargetTemperature()));
+			`THERM: ${this.device.name} Getting Temperature - Device says: ${this.device.getCurrentTemperatureState()} translation says: ${this.toCelsius(this.device.getCurrentTemperatureState())}`
+		);
+		if(this.targetTemperature == undefined)
+			this.initTargetTemperature();
+
+		callback(null, this.targetTemperature);
 	}
 
 	getCoolSetPoint(callback) {
@@ -300,9 +320,7 @@ class ISYThermostatAccessory extends ISYBaseAccessory {
 	getHeatSetPoint(callback) {
 		this.log(`THERM: ${this.device.name} Getting Heating Set Point - Device says: ${this.device.getHeatSetPoint()} translation says: ${this.toCelsius(this.device.getHeatSetPoint())}`);
 		callback(null, this.toCelsius(this.device.getHeatSetPoint()));
-  }
-  
-  
+	}
 
 	getHeatingCoolingMode(callback) {
 		this.log(`THERM: ${this.device.name} Getting Heating Cooling Mode - Device says: ${this.device.getHeatingCoolingMode()}`);
@@ -335,8 +353,9 @@ class ISYThermostatAccessory extends ISYBaseAccessory {
 	// Returns the services supported by the fan device.
 	getServices() {
 		super.getServices();
-    var thermostatService = new Service.Thermostat();
-    thermostatService.getCharacteristic(Characteristic.TargetTemperature).on("get",this.get)
+		var thermostatService = new Service.Thermostat();
+		thermostatService.getCharacteristic(Characteristic.TargetTemperature).on("get", this.getTargetTemperature.bind(this));
+		thermostatService.getCharacteristic(Characteristic.TargetTemperature).on("set", this.setTargetTemperature.bind(this));
 		thermostatService.setCharacteristic(Characteristic.TemperatureDisplayUnits, 1);
 		thermostatService.addCharacteristic(Characteristic.CurrentFanState);
 		thermostatService.getCharacteristic(Characteristic.CurrentFanState).on("get", this.getFanState.bind(this));
@@ -369,36 +388,27 @@ class ISYThermostatAccessory extends ISYBaseAccessory {
 			this.log(`THERM: ${this.device.name} command does not change actual set point`);
 			callback();
 		}
-  }
-  
-  setTargetTemperature(temp, callback) {
-    let targTemp = this.toFahrenheit(temp);
-    if(targTemp != this.calcTargetTemperature())
-    {
-        if(targTemp < this.device.getCoolSetPoint() - 1)
-        { 
-          this.device.sendUpdateCoolSetPointCommand(targTemp, result => {
-            callback();
-          });
-        }
-        else if (targTemp > this.device.getHeatSetPoint() + 1)
-        {
-          this.device.sendUpdateHeatSetPointCommand(targTemp, result => {
-            callback();
-          });
-        }
-    }
-		this.log(`THERM: ${this.device.name} Sending command to setta (pre-translate) to: ${temp}`);
-		var newSetPoint = this.toFahrenheit(temp);
-		this.log(`THERM: ${this.device.name} Sending command to set cool set point to: ${newSetPoint}`);
-		if (Math.abs(newSetPoint - this.device.getCoolSetPoint()) >= 1) {
-			this.device.sendUpdateCoolSetPointCommand(newSetPoint, result => {
-				callback();
-			});
-		} else {
-			this.log(`THERM: ${this.device.name} command does not change actual set point`);
-			callback();
+	}
+
+	setTargetTemperature(temp, callback) {
+		this.log(`THERM: ${this.device.name} requested target temperature (pre-translate) is: ${temp}`);
+		let targTemp = this.toFahrenheit(temp);
+		this.log(`THERM: ${this.device.name} requested target temperature is: ${targTemp}`);
+		if (temp != this.targetTemperature) {
+			if (targTemp < this.device.getCoolSetPoint() - 1) {
+				this.log(`THERM: ${this.device.name} sending command to set cool set point to: ${targTemp}`);
+				this.device.sendUpdateCoolSetPointCommand(targTemp, result => {
+					callback();
+				});
+			} else if (targTemp > this.device.getHeatSetPoint() + 1) {
+				this.log(`THERM: ${this.device.name} sending command to set heat set point to: ${targTemp}`);
+				this.device.sendUpdateHeatSetPointCommand(targTemp, result => {
+					callback();
+				});
+			}
+			this.targetTemperature = temp;
 		}
+
 	}
 
 	setHeatSetPoint(temp, callback) {
@@ -438,9 +448,7 @@ class ISYFanAccessory extends ISYBaseAccessory {
 		// Do the identify action
 		callback();
 	}
-	// Translates the fan speed as an isy-js string into the corresponding homekit constant level.
-	// Homekit doesn't have steps for the fan speed and needs to have a value from 0 to 100. We
-	// split the range into 4 steps and map them to the 4 isy-js levels.
+
 	translateFanSpeedToHK(fanSpeed) {
 		switch (fanSpeed) {
 			case this.device.FAN_OFF:
@@ -483,7 +491,7 @@ class ISYFanAccessory extends ISYBaseAccessory {
 		var newFanState = this.translateHKToFanSpeed(fanStateHK);
 		this.log(`FAN: ${this.device.name} Sending command to set fan state to: ${newFanState}`);
 		if (newFanState != this.device.getCurrentFanState()) {
-			this.device.sendFanCommand(newFanState, function(result) {
+			this.device.sendFanCommand(newFanState, function (result) {
 				callback();
 			});
 		} else {
@@ -524,7 +532,7 @@ class ISYFanAccessory extends ISYBaseAccessory {
 		this.log(`LIGHT: ${this.device.name} Setting powerstate to ${powerOn}`);
 		if (powerOn != this.device.getCurrentLightState()) {
 			this.log(`LIGHT: ${this.device.name} Changing powerstate to ${powerOn}`);
-			this.device.sendLightCommand(powerOn, function(result) {
+			this.device.sendLightCommand(powerOn, function (result) {
 				callback();
 			});
 		} else {
@@ -543,12 +551,12 @@ class ISYFanAccessory extends ISYBaseAccessory {
 		if (level != this.device.getCurrentLightDimState()) {
 			if (level == 0) {
 				this.log(`LIGHT: ${this.device.name} Brightness set to 0, sending off command`);
-				this.device.sendLightCommand(false, function(result) {
+				this.device.sendLightCommand(false, function (result) {
 					callback();
 				});
 			} else {
 				this.log(`LIGHT: ${this.device.name} Changing Brightness to ${level}`);
-				this.device.sendLightDimCommand(level, function(result) {
+				this.device.sendLightDimCommand(level, function (result) {
 					callback();
 				});
 			}
@@ -589,7 +597,21 @@ class ISYFanAccessory extends ISYBaseAccessory {
 		return [this.informationService, fanService];
 	}
 }
+class ISYSwitchAccessory extends ISYBaseAccessory
+{
+	constructor(log,device)
+	{
+		super(log, device);
+	}
+	identify(callback)
+	{
+		callback();
+	}
+	getServices()
+	{
 
+	}
+}
 class ISYOutletAccessory extends ISYBaseAccessory {
 	constructor(log, device) {
 		super(log, device);
@@ -603,7 +625,7 @@ class ISYOutletAccessory extends ISYBaseAccessory {
 	setOutletState(outletState, callback) {
 		this.log(`OUTLET: ${this.device.name} Sending command to set outlet state to: ${outletState}`);
 		if (outletState != this.device.getCurrentOutletState()) {
-			this.device.sendOutletCommand(outletState, function(result) {
+			this.device.sendOutletCommand(outletState, function (result) {
 				callback();
 			});
 		} else {
@@ -648,7 +670,7 @@ class ISYLockAccessory extends ISYBaseAccessory {
 		this.log(this, `LOCK: ${this.device.name} Sending command to set lock state to: ${lockState}`);
 		if (lockState != this.getDeviceCurrentStateAsHK()) {
 			var targetLockValue = lockState == 0 ? false : true;
-			this.device.sendLockCommand(targetLockValue, function(result) {
+			this.device.sendLockCommand(targetLockValue, function (result) {
 				callback();
 			});
 		} else {
@@ -693,8 +715,8 @@ class ISYLightAccessory extends ISYBaseAccessory {
 	// Handles the identify command
 	identify(callback) {
 		var that = this;
-		this.device.sendLightCommand(true, function(result) {
-			that.device.sendLightCommand(false, function(result) {
+		this.device.sendLightCommand(true, function (result) {
+			that.device.sendLightCommand(false, function (result) {
 				callback();
 			});
 		});
@@ -704,7 +726,7 @@ class ISYLightAccessory extends ISYBaseAccessory {
 		this.log(`LIGHT: ${this.device.name} Setting powerstate to ${powerOn}`);
 		if (powerOn != this.device.getCurrentLightState()) {
 			this.log(`LIGHT: ${this.device.name} Changing powerstate to ${powerOn}`);
-			this.device.sendLightCommand(powerOn, function(result) {
+			this.device.sendLightCommand(powerOn, function (result) {
 				callback();
 			});
 		} else {
@@ -730,12 +752,12 @@ class ISYLightAccessory extends ISYBaseAccessory {
 		if (level != this.device.getCurrentLightDimState()) {
 			if (level == 0) {
 				this.log(`LIGHT: ${this.device.name} Brightness set to 0, sending off command`);
-				this.device.sendLightCommand(false, function(result) {
+				this.device.sendLightCommand(false, function (result) {
 					callback();
 				});
 			} else {
 				this.log(`LIGHT: ${this.device.name} Changing Brightness to ${level}`);
-				this.device.sendLightDimCommand(level, function(result) {
+				this.device.sendLightDimCommand(level, function (result) {
 					callback();
 				});
 			}
@@ -770,8 +792,8 @@ class ISYSceneAccessory extends ISYBaseAccessory {
 	// Handles the identify command
 	identify(callback) {
 		var that = this;
-		this.device.sendLightCommand(true, function(result) {
-			that.device.sendLightCommand(false, function(result) {
+		this.device.sendLightCommand(true, function (result) {
+			that.device.sendLightCommand(false, function (result) {
 				callback();
 			});
 		});
@@ -781,7 +803,7 @@ class ISYSceneAccessory extends ISYBaseAccessory {
 		this.log(`SCENE: ${this.device.name} Setting powerstate to ${powerOn}`);
 		if (!this.device.getAreAllLightsInSpecifiedState(powerOn)) {
 			this.log(`SCENE: ${this.device.name} Changing powerstate to ${powerOn}`);
-			this.device.sendLightCommand(powerOn, function(result) {
+			this.device.sendLightCommand(powerOn, function (result) {
 				callback();
 			});
 		} else {
@@ -890,7 +912,7 @@ class ISYElkAlarmPanelAccessory extends ISYBaseAccessory {
 		var targetState = this.translateHKToAlarmTargetState(targetStateHK);
 		this.log("ALARMSYSTEM: " + this.device.name + " Would send the target state of: " + targetState);
 		if (this.device.getAlarmMode() != targetState) {
-			this.device.sendSetAlarmModeCommand(targetState, function(result) {
+			this.device.sendSetAlarmModeCommand(targetState, function (result) {
 				callback();
 			});
 		} else {
@@ -965,11 +987,11 @@ class ISYElkAlarmPanelAccessory extends ISYBaseAccessory {
 		this.log("ALARMPANEL: " + this.device.name + " Source device. Currenty state locally -" + this.device.getAlarmStatusAsText());
 		this.log(
 			"ALARMPANEL: " +
-				this.device.name +
-				" Got alarm change notification. Setting HK target state to: " +
-				this.translateAlarmTargetStateToHK() +
-				" Setting HK Current state to: " +
-				this.translateAlarmCurrentStateToHK()
+			this.device.name +
+			" Got alarm change notification. Setting HK target state to: " +
+			this.translateAlarmTargetStateToHK() +
+			" Setting HK Current state to: " +
+			this.translateAlarmCurrentStateToHK()
 		);
 		this.alarmPanelService.setCharacteristic(Characteristic.SecuritySystemTargetState, this.translateAlarmTargetStateToHK());
 		this.alarmPanelService.setCharacteristic(Characteristic.SecuritySystemCurrentState, this.translateAlarmCurrentStateToHK());
@@ -1016,7 +1038,7 @@ class ISYGarageDoorAccessory extends ISYBaseAccessory {
 		callback();
 	}
 	sendGarageDoorCommand(callback) {
-		this.relayDevice.sendLightCommand(true, function() {
+		this.relayDevice.sendLightCommand(true, function () {
 			callback();
 		});
 	}
@@ -1045,8 +1067,8 @@ class ISYGarageDoorAccessory extends ISYBaseAccessory {
 			if (targetState == Characteristic.TargetDoorState.CLOSED) {
 				this.log("GARAGE: " + this.device.name + " Current state is opening and target is closed. Sending command and changing state to closing");
 				this.garageDoorService.setCharacteristic(Characteristic.CurrentDoorState, Characteristic.CurrentDoorState.CLOSING);
-				this.sendGarageDoorCommand(function() {
-					setTimeout(function() {
+				this.sendGarageDoorCommand(function () {
+					setTimeout(function () {
 						that.sendGarageDoorCommand(callback);
 					}, 3000);
 				});
@@ -1056,7 +1078,7 @@ class ISYGarageDoorAccessory extends ISYBaseAccessory {
 			if (targetState == Characteristic.TargetDoorState.OPEN) {
 				this.log("GARAGE: " + this.device.name + " Current state is closing and target is open. Sending command and setting timeout to complete");
 				this.garageDoorService.setCharacteristic(Characteristic.CurrentDoorState, Characteristic.CurrentDoorState.OPENING);
-				this.sendGarageDoorCommand(function() {
+				this.sendGarageDoorCommand(function () {
 					that.sendGarageDoorCommand(callback);
 					setTimeout(that.completeOpen.bind(that), that.timeToOpen);
 				}, 3000);
