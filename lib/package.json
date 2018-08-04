@@ -36,7 +36,7 @@
   },
   "dependencies": {
     "faye-websocket": "",
-    "isy-js": "file:../isy-js",
+    "isy-js": "file:../../isy-js",
     "restler": "",
     "xmldoc": ""
   },
