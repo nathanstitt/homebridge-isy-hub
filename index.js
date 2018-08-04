@@ -1,10 +1,6 @@
-/*
- ISY-JS
- 
- See README.md for details.
-*/
-
-var Service, Characteristic, types;
+var Service;
+var Characteristic;
+var types;
 
 import {
 	ISY
