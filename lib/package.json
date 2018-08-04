@@ -1,7 +1,7 @@
 {
   "name": "homebridge-isy-js",
-  "version": "0.1.9",
-  "description": "Homebridge plugin for ISY series of home controllers from universal devices. Unsupported and no longer under active development.",
+  "version": "0.2.0",
+  "description": "Homebridge plugin for ISY series of home controllers from universal devices.",
   "note": "",
   "main": "index.js",
   "scripts": {
@@ -12,10 +12,11 @@
   "engines": {
     "node": ">4.0.0",
     "homebridge": ">=0.2.0"
+
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/rodtoll/homebridge-isy-js.git"
+    "url": "https://github.com/pradeepmouli/homebridge-isy-js.git"
   },
   "keywords": [
     "homebridge-plugin",
@@ -28,8 +29,10 @@
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.6.1",
+    "babel-preset-typescript": "",
+    
     "fake-isy-994i": "",
-    "flow": "^0.2.3",
+  
     "hap-nodejs": "",
     "homebridge": "",
     "mocha": ""
