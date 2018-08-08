@@ -12,7 +12,6 @@
   "engines": {
     "node": ">4.0.0",
     "homebridge": ">=0.2.0"
-
   },
   "repository": {
     "type": "git",
@@ -30,16 +29,14 @@
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "babel-preset-typescript": "",
-    
     "fake-isy-994i": "",
-  
     "hap-nodejs": "",
     "homebridge": "",
     "mocha": ""
   },
   "dependencies": {
     "faye-websocket": "",
-    "isy-js": "file:../isy-js",
+    "isy-js": "",
     "restler": "",
     "xmldoc": ""
   },
