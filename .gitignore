@@ -1,1 +1,7 @@
 node_modules/*
+.eslintrc
+.npmrc
+package-lock.json
+.jshintrc
+.vscode
+.vscode/*
