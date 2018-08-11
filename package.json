@@ -3,10 +3,10 @@
   "version": "0.2.0",
   "description": "Homebridge plugin for ISY series of home controllers from universal devices.",
   "note": "",
-  "main": "index.js",
+  "main": "./lib/index.js",
   "scripts": {
     "test": "mocha",
-    "build": "babel index.js -d lib",
+    "build": "babel src/index.js -o lib/index.js",
     "start": "echo \"Error: configure and run homebridge to start\" && exit 1"
   },
   "engines": {
@@ -27,7 +27,7 @@
   ],
   "devDependencies": {
     "babel-cli": "^6.26.0",
-    "babel-preset-env": "^1.6.1",
+    "babel-preset-env": "",
     "babel-preset-typescript": "",
     "fake-isy-994i": "",
     "hap-nodejs": "",
@@ -36,7 +36,7 @@
   },
   "dependencies": {
     "faye-websocket": "",
-    "isy-js": "",
+    "isy-js": "git+https://github.com/pradeepmouli/isy-js.git",
     "restler": "",
     "xmldoc": ""
   },
