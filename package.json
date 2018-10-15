@@ -1,17 +1,17 @@
 {
   "name": "homebridge-isy-js",
-  "version": "0.2.0",
+  "version": "0.2.5",
   "description": "Homebridge plugin for ISY series of home controllers from universal devices.",
   "note": "",
-  "main": "./lib/index.js",
+  "main": "./lib/plugin.js",
   "scripts": {
     "test": "mocha",
-    "build": "babel src/index.js -o lib/index.js",
-    "start": "echo \"Error: configure and run homebridge to start\" && exit 1"
+    "prepare": "tsc",
+    "start": "homebridge -D -P ./"
   },
   "engines": {
-    "node": ">4.0.0",
-    "homebridge": ">=0.2.0"
+    "node": ">8.0.0",
+    "homebridge": ">=0.4.5"
   },
   "repository": {
     "type": "git",
@@ -30,15 +30,18 @@
     "babel-preset-env": "",
     "babel-preset-typescript": "",
     "fake-isy-994i": "",
-    "hap-nodejs": "",
-    "homebridge": "",
-    "mocha": ""
+    "mocha": "",
+    "@types/node": "^10.11.0",
+    "@types/restler": ""
   },
   "dependencies": {
     "faye-websocket": "",
-    "isy-js": "git+https://github.com/pradeepmouli/isy-js.git",
-    "restler": "",
-    "xmldoc": ""
+    "hap-nodejs": "",
+    "homebridge": "^0.4.45",
+    "homebridge-lib": "^1.0.9",
+    "isy-js": "file:../isy-js",
+    "restler": "^3.4.0",
+    "xmldoc": "^1.1.2"
   },
   "author": "pradeepmouli",
   "license": "MIT",

@@ -1,0 +1,18 @@
+{
+    "compileOnSave": true,
+    "compilerOptions": {
+        "target": "es2018",
+       
+        "module": "commonjs",
+        "traceResolution": true,
+        "esModuleInterop": true,
+        "baseUrl": "./lib",
+        "paths": {
+            "hap-nodejs": ["hap.d.ts"]
+        },
+ 
+        "sourceMap": false,
+        "allowSyntheticDefaultImports": true
+    }
+   
+}
