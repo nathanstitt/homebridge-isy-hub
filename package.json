@@ -39,7 +39,7 @@
     "hap-nodejs": "",
     "homebridge": "^0.4.45",
     "homebridge-lib": "^1.0.9",
-    "isy-js": "file:../isy-js",
+    "isy-js": "git+https://github.com/pradeepmouli/isy-js.git#v5",
     "restler": "^3.4.0",
     "xmldoc": "^1.1.2"
   },
