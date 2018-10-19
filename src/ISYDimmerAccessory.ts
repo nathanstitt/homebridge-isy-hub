@@ -2,6 +2,7 @@ import { InsteonDimmableDevice, InsteonRelayDevice } from 'isy-js';
 import { ISYRelayAccessory } from 'ISYRelayAccessory';
 import { ISYDeviceAccessory } from './ISYDeviceAccessory';
 import { Characteristic, Service } from './plugin';
+
 export class ISYDimmableAccessory<T extends InsteonDimmableDevice> extends ISYRelayAccessory<T> {
 
 	constructor(log, device: T) {
@@ -40,10 +41,13 @@ export class ISYDimmableAccessory<T extends InsteonDimmableDevice> extends ISYRe
 	// Returns the set of services supported by this object.
 	public getServices() {
 		super.getServices();
+		this.primaryService = new Service.Lightbulb();
+		this.primaryService.getCharacteristic(Characteristic.On).on('set', this.setPowerState.bind(this));
+		this.primaryService.getCharacteristic(Characteristic.On).on('get', this.getPowerState.bind(this));
 		// lightBulbService.getCharacteristic(Characteristic.On).on('get', this.getPowerState.bind(this));
-		this.lightService.addCharacteristic(Characteristic.Brightness).on('get', this.getBrightness.bind(this));
-		this.lightService.getCharacteristic(Characteristic.Brightness).on('set', this.setBrightness.bind(this));
+		this.primaryService.addCharacteristic(Characteristic.Brightness).on('get', this.getBrightness.bind(this));
+		this.primaryService.getCharacteristic(Characteristic.Brightness).on('set', this.setBrightness.bind(this));
 
-		return [this.informationService, this.lightService];
+		return [this.informationService, this.primaryService];
 	}
 }

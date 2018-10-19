@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const isy_js_1 = require("isy-js");
-const plugin_1 = require("./plugin");
 const ISYDeviceAccessory_1 = require("./ISYDeviceAccessory");
+const plugin_1 = require("./plugin");
 class ISYThermostatAccessory extends ISYDeviceAccessory_1.ISYDeviceAccessory {
     constructor(log, device) {
         super(log, device);
@@ -16,13 +16,6 @@ class ISYThermostatAccessory extends ISYDeviceAccessory_1.ISYDeviceAccessory {
     getCurrentTemperature(callback) {
         this.logger(`Getting Current Temperature - Device says: ${this.device.currentTemperature} says: ${this.toCelsius(this.device.currentTemperature)}`);
         callback(null, this.toCelsius(this.device.currentTemperature));
-    }
-    getTargetTemperature(callback) {
-        this.logger(`Getting Temperature - Device says: ${this.device.currentTemperature} translation says: ${this.toCelsius(this.device.currentTemperature)}`);
-        if (this.targetTemperature === undefined) {
-            this.initTargetTemperature();
-        }
-        callback(null, this.targetTemperature);
     }
     getCoolSetPoint(callback) {
         this.logger(`Getting Cooling Set Point - Device says: ${this.device.coolSetPoint} translation says: ${this.toCelsius(this.device.coolSetPoint)}`);
@@ -53,7 +46,7 @@ class ISYThermostatAccessory extends ISYDeviceAccessory_1.ISYDeviceAccessory {
         super.handleExternalChange(propertyName, value, formattedValue);
         switch (propertyName) {
             case isy_js_1.Props.Status:
-                this.thermostatService.updateCharacteristic(plugin_1.Characteristic.CurrentTemperature, String(this.toCelsius(this.device.currentTemperature)));
+                this.thermostatService.updateCharacteristic(plugin_1.Characteristic.CurrentTemperature, this.toCelsius(this.device.currentTemperature));
                 break;
             case isy_js_1.Props.Climate.CoolSetPoint:
                 this.thermostatService.updateCharacteristic(plugin_1.Characteristic.CoolingThresholdTemperature, this.toCelsius(this.device.coolSetPoint));
@@ -84,7 +77,7 @@ class ISYThermostatAccessory extends ISYDeviceAccessory_1.ISYDeviceAccessory {
         // thermostatService.getCharacteristic(Characteristic.TargetTemperature).on("set", this.setTargetTemperature.bind(this));
         this.thermostatService.setCharacteristic(plugin_1.Characteristic.TemperatureDisplayUnits, 1);
         this.thermostatService.addCharacteristic(plugin_1.Characteristic.CurrentFanState);
-        this.thermostatService.getCharacteristic(plugin_1.Characteristic.CurrentFanState).on('get', this.getFanMode.bind(this));
+        this.thermostatService.getCharacteristic(plugin_1.Characteristic.CurrentFanState).on('get', (f) => this.getFanMode(f));
         this.thermostatService.getCharacteristic(plugin_1.Characteristic.CurrentTemperature).on('get', this.getCurrentTemperature.bind(this));
         this.thermostatService.getCharacteristic(plugin_1.Characteristic.CoolingThresholdTemperature).on('get', this.getCoolSetPoint.bind(this));
         this.thermostatService.getCharacteristic(plugin_1.Characteristic.CoolingThresholdTemperature).on('set', this.setCoolSetPoint.bind(this));

@@ -3,7 +3,7 @@
   "version": "0.2.5",
   "description": "Homebridge plugin for ISY series of home controllers from universal devices.",
   "note": "",
-  "main": "./lib/plugin.js",
+  "main": "./src/plugin.js",
   "scripts": {
     "test": "mocha",
     "prepare": "tsc",

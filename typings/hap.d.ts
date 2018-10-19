@@ -24,7 +24,9 @@ declare namespace HAPNodeJS {
     }
 
     export interface Service extends IEventEmitterAccessory {
-        new (displayName: string, UUID: string, subtype: string): Service;
+        new (displayName?: string, UUID?: string, subtype?: string): Service;
+     
+
 
         displayName: string;
         UUID: string;
@@ -82,6 +84,7 @@ declare namespace HAPNodeJS {
         Thermostat: Service;
         Window: Service;
         WindowCovering: Service;
+     
     }
 
     export interface CameraSource {

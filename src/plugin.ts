@@ -1,7 +1,8 @@
 import { API } from 'homebridge';
 import { ISYPlatform } from './ISYPlatform';
 
-export let Service: any;
+
+export let Service: HAPNodeJS.Service;
 export let Characteristic: any;
 let CProps: HAPNodeJS.CharacteristicProps;
 // tslint:disable-next-line:variable-name
@@ -16,14 +17,9 @@ declare global {
 }
 
 Promise.prototype.handleWith = async function(callback) {
-	console.log('handling');
-
 	return this.then(() => {
-		console.log('success');
 		callback(false);
 	}).catch((msg) => {
-
-		console.log('error: ' + JSON.stringify(msg));
 		callback(true);
 	});
 };
@@ -33,7 +29,6 @@ export default (homebridge: API) => {
 	Characteristic = homebridge.hap.Characteristic;
 	Service = homebridge.hap.Service;
 	UUIDGen = homebridge.hap.uuid;
-
 	Hap = homebridge.hap;
 	Service = Hap.Service;
 	const api = homebridge;

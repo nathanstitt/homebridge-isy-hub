@@ -1,5 +1,5 @@
 export interface IgnoreDeviceRule {
-	name: string;
+	nameContains: string;
 	lastAddressDigit: number;
 	address: string;
 	typeCode: string;

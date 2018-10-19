@@ -1,6 +1,7 @@
 import { InsteonDoorWindowSensorDevice } from 'isy-js';
-import { Characteristic, Service } from "./plugin";
-import { ISYDeviceAccessory } from "./ISYDeviceAccessory";
+import { ISYDeviceAccessory } from './ISYDeviceAccessory';
+import { Characteristic, Service } from './plugin';
+
 export class ISYDoorWindowSensorAccessory extends ISYDeviceAccessory<InsteonDoorWindowSensorDevice> {
 	public doorWindowState: boolean;
 	public sensorService: any;

@@ -1,3 +1,4 @@
+import { IgnoreDeviceRule } from 'config';
 import { API } from 'homebridge';
 import { ElkAlarmSensorDevice, InsteonDoorWindowSensorDevice, InsteonFanDevice, InsteonLockDevice, InsteonMotionSensorDevice, InsteonOutletDevice, InsteonRelayDevice, InsteonThermostatDevice, ISY, ISYNode, NodeTypes } from 'isy-js';
 import { ISYDoorWindowSensorAccessory } from './ISYDoorWindowSensorAccessory';
@@ -20,6 +21,7 @@ export class ISYPlatform {
 	public debugLoggingEnabled: boolean;
 	public includeAllScenes: boolean;
 	public includedScenes: [];
+	public ignoreRules: IgnoreDeviceRule[];
 	public isy: ISY;
 	constructor(log, config, homebridge: API) {
 		this.log = log;
@@ -31,6 +33,7 @@ export class ISYPlatform {
 		this.debugLoggingEnabled = config.debugLoggingEnabled === undefined ? false : config.debugLoggingEnabled;
 		this.includeAllScenes = config.includeAllScenes === undefined ? false : config.includeAllScenes;
 		this.includedScenes = config.includedScenes === undefined ? [] : config.includedScenes;
+		this.ignoreRules = config.ignoreDevices;
 		this.isy = new ISY(this.host, this.username, this.password, config.elkEnabled, null, config.useHttps, true, this.debugLoggingEnabled, null, log);
 	}
 	public logger(msg: string) {
@@ -49,20 +52,19 @@ export class ISYPlatform {
 				}
 			}
 			return true;
-		}
-		else {
+		} else {
 			if (this.config.ignoreDevices === undefined) {
 				return false;
 			}
 			const deviceName = device.name;
-			for (const rule of this.config.ignoreDevices) {
+			for (const rule of this.ignoreRules) {
 				if (rule.nameContains !== undefined && rule.nameContains !== '') {
 					if (deviceName.indexOf(rule.nameContains) === -1) {
 						continue;
 					}
 				}
-				if (rule.lastAddressDigit !== undefined && rule.lastAddressDigit !== '') {
-					if (deviceAddress.indexOf(rule.lastAddressDigit, deviceAddress.length - 2) === -1) {
+				if (rule.lastAddressDigit !== undefined && rule.lastAddressDigit !== null) {
+					if (deviceAddress.indexOf(String(rule.lastAddressDigit), deviceAddress.length - 2) === -1) {
 						continue;
 					}
 				}
@@ -71,7 +73,12 @@ export class ISYPlatform {
 						continue;
 					}
 				}
-				this.logger('Ignoring device: ' + deviceName + ' [' + deviceAddress + '] because of rule [' + rule.nameContains + '] [' + rule.lastAddressDigit + '] [' + rule.address + ']');
+				if (rule.nodeDef !== undefined) {
+					if (device.nodeDefId !== rule.nodeDef) {
+						continue;
+					}
+				}
+				this.logger('Ignoring device: ' + deviceName + ' (' + deviceAddress + ') because of rule: ' + JSON.stringify(rule));
 				return true;
 			}
 		}
@@ -114,8 +121,7 @@ export class ISYPlatform {
 			if (rule.newName === undefined) {
 				this.logger(`Rule to rename device is present but no new name specified. Impacting device: ${deviceName}`);
 				return deviceName;
-			}
-			else {
+			} else {
 				this.logger(`Renaming device: ${deviceName}[${deviceAddress}] to [${rule.newName}] because of rule [${rule.nameContains}] [${rule.lastAddressDigit}] [${rule.address}]`);
 				return rule.newName;
 			}
@@ -142,8 +148,7 @@ export class ISYPlatform {
 						relayAddress += `2`;
 						const relayDevice = that.isy.getDevice(relayAddress);
 						homeKitDevice = new ISYGarageDoorAccessory(that.logger.bind(that), device, relayDevice, garageInfo.name, garageInfo.timeToOpen, garageInfo.alternate);
-					}
-					else {
+					} else {
 						homeKitDevice = this.createAccessory(device);
 					}
 					if (homeKitDevice !== null) {
@@ -161,8 +166,7 @@ export class ISYPlatform {
 			if (that.isy.elkEnabled) {
 				if (results.length >= 100) {
 					that.logger('Skipping adding Elk Alarm panel as device count already at maximum');
-				}
-				else {
+				} else {
 					const panelDevice = that.isy.getElkAlarmPanel();
 					panelDevice.name = that.renameDeviceIfNeeded(panelDevice);
 					const panelDeviceHK = new ISYElkAlarmPanelAccessory(that.log, panelDevice);
@@ -177,26 +181,19 @@ export class ISYPlatform {
 	public createAccessory(device) {
 		if (device instanceof InsteonRelayDevice) {
 			return new ISYRelayAccessory(this.logger.bind(this), device);
-		}
-		else if (device instanceof InsteonLockDevice) {
+		} else if (device instanceof InsteonLockDevice) {
 			return new ISYLockAccessory(this.logger.bind(this), device);
-		}
-		else if (device instanceof InsteonOutletDevice) {
+		} else if (device instanceof InsteonOutletDevice) {
 			return new ISYOutletAccessory(this.logger.bind(this), device);
-		}
-		else if (device instanceof InsteonFanDevice) {
+		} else if (device instanceof InsteonFanDevice) {
 			return new ISYFanAccessory(this.logger.bind(this), device);
-		}
-		else if (device instanceof InsteonDoorWindowSensorDevice) {
+		} else if (device instanceof InsteonDoorWindowSensorDevice) {
 			return new ISYDoorWindowSensorAccessory(this.logger.bind(this), device);
-		}
-		else if (device instanceof ElkAlarmSensorDevice) {
+		} else if (device instanceof ElkAlarmSensorDevice) {
 			return new ISYElkAlarmPanelAccessory(this.logger.bind(this), device);
-		}
-		else if (device instanceof InsteonMotionSensorDevice) {
+		} else if (device instanceof InsteonMotionSensorDevice) {
 			return new ISYMotionSensorAccessory(this.logger.bind(this), device);
-		}
-		else if (device instanceof InsteonThermostatDevice) {
+		} else if (device instanceof InsteonThermostatDevice) {
 			return new ISYThermostatAccessory(this.logger.bind(this), device);
 		}
 		return null;

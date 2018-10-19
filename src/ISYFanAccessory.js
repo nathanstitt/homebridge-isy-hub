@@ -127,7 +127,7 @@ class ISYFanAccessory extends ISYDeviceAccessory_1.ISYDeviceAccessory {
         const s = super.getServices();
         const fanService = new plugin_1.Service.Fan();
         this.fanService = fanService;
-        const lightService = new plugin_1.Service.Lightbulb();
+        const lightService = new plugin_1.Service.Lightbulb(this.device.name + " - Light");
         this.lightService = lightService;
         fanService.getCharacteristic(plugin_1.Characteristic.On).on('set', this.setFanOnState.bind(this));
         fanService.getCharacteristic(plugin_1.Characteristic.On).on('get', this.getFanOnState.bind(this));

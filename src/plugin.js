@@ -4,12 +4,9 @@ const ISYPlatform_1 = require("./ISYPlatform");
 let CProps;
 let HapTypes;
 Promise.prototype.handleWith = async function (callback) {
-    console.log('handling');
     return this.then(() => {
-        console.log('success');
         callback(false);
     }).catch((msg) => {
-        console.log('error: ' + JSON.stringify(msg));
         callback(true);
     });
 };

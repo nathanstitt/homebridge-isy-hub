@@ -22,6 +22,7 @@ class ISYPlatform {
         this.debugLoggingEnabled = config.debugLoggingEnabled === undefined ? false : config.debugLoggingEnabled;
         this.includeAllScenes = config.includeAllScenes === undefined ? false : config.includeAllScenes;
         this.includedScenes = config.includedScenes === undefined ? [] : config.includedScenes;
+        this.ignoreRules = config.ignoreDevices;
         this.isy = new isy_js_1.ISY(this.host, this.username, this.password, config.elkEnabled, null, config.useHttps, true, this.debugLoggingEnabled, null, log);
     }
     logger(msg) {
@@ -46,14 +47,14 @@ class ISYPlatform {
                 return false;
             }
             const deviceName = device.name;
-            for (const rule of this.config.ignoreDevices) {
+            for (const rule of this.ignoreRules) {
                 if (rule.nameContains !== undefined && rule.nameContains !== '') {
                     if (deviceName.indexOf(rule.nameContains) === -1) {
                         continue;
                     }
                 }
-                if (rule.lastAddressDigit !== undefined && rule.lastAddressDigit !== '') {
-                    if (deviceAddress.indexOf(rule.lastAddressDigit, deviceAddress.length - 2) === -1) {
+                if (rule.lastAddressDigit !== undefined && rule.lastAddressDigit !== null) {
+                    if (deviceAddress.indexOf(String(rule.lastAddressDigit), deviceAddress.length - 2) === -1) {
                         continue;
                     }
                 }
@@ -62,7 +63,12 @@ class ISYPlatform {
                         continue;
                     }
                 }
-                this.logger('Ignoring device: ' + deviceName + ' [' + deviceAddress + '] because of rule [' + rule.nameContains + '] [' + rule.lastAddressDigit + '] [' + rule.address + ']');
+                if (rule.nodeDef !== undefined) {
+                    if (device.nodeDefId !== rule.nodeDef) {
+                        continue;
+                    }
+                }
+                this.logger('Ignoring device: ' + deviceName + ' (' + deviceAddress + ') because of rule: ' + JSON.stringify(rule));
                 return true;
             }
         }

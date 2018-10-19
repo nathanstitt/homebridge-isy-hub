@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const plugin_1 = require("./plugin");
 const ISYAccessory_1 = require("./ISYAccessory");
+const plugin_1 = require("./plugin");
 class ISYSceneAccessory extends ISYAccessory_1.ISYAccessory {
     constructor(log, scene) {
         super(log, scene);
@@ -16,7 +16,7 @@ class ISYSceneAccessory extends ISYAccessory_1.ISYAccessory {
     // Handles request to set the current powerstate from homekit. Will ignore redundant commands.
     setPowerState(powerOn, callback) {
         this.logger(`Setting powerstate to ${powerOn}`);
-        if (!this.scene.getAreAllLightsInSpecifiedState(powerOn)) {
+        if (this.scene.isOn != powerOn) {
             this.logger(`Changing powerstate to ${powerOn}`);
             this.scene.updateIsOn(powerOn).handleWith(callback);
         }
@@ -53,15 +53,18 @@ class ISYSceneAccessory extends ISYAccessory_1.ISYAccessory {
     // Returns the set of services supported by this object.
     getServices() {
         super.getServices();
-        const lightBulbService = new plugin_1.Service.Lightbulb();
-        this.lightService = lightBulbService;
-        lightBulbService.getCharacteristic(plugin_1.Characteristic.On).on('set', this.setPowerState.bind(this));
-        lightBulbService.getCharacteristic(plugin_1.Characteristic.On).on('get', this.getPowerState.bind(this));
         if (this.dimmable) {
-            lightBulbService.addCharacteristic(plugin_1.Characteristic.Brightness).on('get', this.getBrightness.bind(this));
-            lightBulbService.getCharacteristic(plugin_1.Characteristic.Brightness).on('set', this.setBrightness.bind(this));
+            this.lightService = new plugin_1.Service.Lightbulb();
+            this.lightService.addCharacteristic(plugin_1.Characteristic.Brightness).on('get', (f) => this.getBrightness(f)).on('set', (l, f) => this.setBrightness(l, f));
         }
-        return [this.informationService, lightBulbService];
+        else {
+            this.lightService = new plugin_1.Service.Switch();
+        }
+        this.lightService
+            .getCharacteristic(plugin_1.Characteristic.On)
+            .on('set', this.setPowerState.bind(this))
+            .on('get', this.getPowerState.bind(this));
+        return [this.informationService, this.lightService];
     }
 }
 exports.ISYSceneAccessory = ISYSceneAccessory;

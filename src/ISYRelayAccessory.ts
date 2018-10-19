@@ -1,9 +1,10 @@
 import { InsteonDimmableDevice, InsteonRelayDevice } from 'isy-js';
 import { ISYDeviceAccessory } from './ISYDeviceAccessory';
 import { Characteristic, Service } from './plugin';
+
 export class ISYRelayAccessory<T extends InsteonRelayDevice> extends ISYDeviceAccessory<T> {
-	public dimmable: boolean;
-	public lightService: any;
+	public primaryService: HAPNodeJS.Service;
+
 	constructor(log, device: T) {
 		super(log, device);
 		this.dimmable = device instanceof InsteonDimmableDevice;
@@ -14,8 +15,7 @@ export class ISYRelayAccessory<T extends InsteonRelayDevice> extends ISYDeviceAc
 		if (powerOn !== this.device.isOn) {
 			this.device
 				.updateIsOn(powerOn).handleWith(callback);
-		}
-		else {
+		} else {
 			this.logger(`Ignoring redundant setPowerState`);
 			callback();
 		}
@@ -24,9 +24,6 @@ export class ISYRelayAccessory<T extends InsteonRelayDevice> extends ISYDeviceAc
 	public handleExternalChange(propertyName, value, formattedValue) {
 		super.handleExternalChange(propertyName, value, formattedValue);
 		this.lightService.updateCharacteristic(Characteristic.On, this.device.isOn);
-		if (this.dimmable) {
-			this.lightService.updateCharacteristic(Characteristic.Brightness, this.device.brightnessLevel);
-		}
 	}
 	// Handles request to get the current on state
 	// Handles request to get the current on state
@@ -51,14 +48,11 @@ export class ISYRelayAccessory<T extends InsteonRelayDevice> extends ISYDeviceAc
 	// Returns the set of services supported by this object.
 	public getServices() {
 		super.getServices();
-		const lightBulbService = new Service.Lightbulb();
-		this.lightService = lightBulbService;
-		lightBulbService.getCharacteristic(Characteristic.On).on('set', this.setPowerState.bind(this));
-		lightBulbService.getCharacteristic(Characteristic.On).on('get', this.getPowerState.bind(this));
-		if (this.dimmable) {
-			lightBulbService.addCharacteristic(Characteristic.Brightness).on('get', this.getBrightness.bind(this));
-			lightBulbService.getCharacteristic(Characteristic.Brightness).on('set', this.setBrightness.bind(this));
-		}
-		return [this.informationService, lightBulbService];
+
+		this.primaryService = new Service.Switch();
+		this.primaryService.getCharacteristic(Characteristic.On).on('set', this.setPowerState.bind(this));
+		this.primaryService.getCharacteristic(Characteristic.On).on('get', this.getPowerState.bind(this));
+
+		return [this.informationService, this.primaryService];
 	}
 }

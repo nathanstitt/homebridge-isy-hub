@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const plugin_1 = require("./plugin");
 const ISYDeviceAccessory_1 = require("./ISYDeviceAccessory");
+const plugin_1 = require("./plugin");
 class ISYDoorWindowSensorAccessory extends ISYDeviceAccessory_1.ISYDeviceAccessory {
     constructor(log, device) {
         super(log, device);

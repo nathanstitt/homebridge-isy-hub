@@ -35,10 +35,13 @@ class ISYDimmableAccessory extends ISYRelayAccessory_1.ISYRelayAccessory {
     // Returns the set of services supported by this object.
     getServices() {
         super.getServices();
+        this.primaryService = new plugin_1.Service.Lightbulb();
+        this.primaryService.getCharacteristic(plugin_1.Characteristic.On).on('set', this.setPowerState.bind(this));
+        this.primaryService.getCharacteristic(plugin_1.Characteristic.On).on('get', this.getPowerState.bind(this));
         // lightBulbService.getCharacteristic(Characteristic.On).on('get', this.getPowerState.bind(this));
-        this.lightService.addCharacteristic(plugin_1.Characteristic.Brightness).on('get', this.getBrightness.bind(this));
-        this.lightService.getCharacteristic(plugin_1.Characteristic.Brightness).on('set', this.setBrightness.bind(this));
-        return [this.informationService, this.lightService];
+        this.primaryService.addCharacteristic(plugin_1.Characteristic.Brightness).on('get', this.getBrightness.bind(this));
+        this.primaryService.getCharacteristic(plugin_1.Characteristic.Brightness).on('set', this.setBrightness.bind(this));
+        return [this.informationService, this.primaryService];
     }
 }
 exports.ISYDimmableAccessory = ISYDimmableAccessory;

@@ -1,6 +1,6 @@
 import { InsteonThermostatDevice, Props } from 'isy-js';
-import { Characteristic, Service } from "./plugin";
-import { ISYDeviceAccessory } from "./ISYDeviceAccessory";
+import { ISYDeviceAccessory } from './ISYDeviceAccessory';
+import { Characteristic, Service } from './plugin';
 export class ISYThermostatAccessory extends ISYDeviceAccessory<InsteonThermostatDevice> {
 	public targetTemperature: number;
 	public thermostatService: HAPNodeJS.Service;
@@ -18,13 +18,6 @@ export class ISYThermostatAccessory extends ISYDeviceAccessory<InsteonThermostat
 		callback(null, this.toCelsius(this.device.currentTemperature));
 	}
 
-	public getTargetTemperature(callback) {
-		this.logger(`Getting Temperature - Device says: ${this.device.currentTemperature} translation says: ${this.toCelsius(this.device.currentTemperature)}`);
-		if (this.targetTemperature === undefined) {
-			this.initTargetTemperature();
-		}
-		callback(null, this.targetTemperature);
-	}
 	public getCoolSetPoint(callback) {
 		this.logger(`Getting Cooling Set Point - Device says: ${this.device.coolSetPoint} translation says: ${this.toCelsius(this.device.coolSetPoint)}`);
 		callback(null, this.toCelsius(this.device.coolSetPoint));
@@ -54,7 +47,7 @@ export class ISYThermostatAccessory extends ISYDeviceAccessory<InsteonThermostat
 		super.handleExternalChange(propertyName, value, formattedValue);
 		switch (propertyName) {
 			case Props.Status:
-				this.thermostatService.updateCharacteristic(Characteristic.CurrentTemperature, String(this.toCelsius(this.device.currentTemperature)));
+				this.thermostatService.updateCharacteristic(Characteristic.CurrentTemperature, this.toCelsius(this.device.currentTemperature));
 				break;
 			case Props.Climate.CoolSetPoint:
 				this.thermostatService.updateCharacteristic(Characteristic.CoolingThresholdTemperature, this.toCelsius(this.device.coolSetPoint));
@@ -85,7 +78,7 @@ export class ISYThermostatAccessory extends ISYDeviceAccessory<InsteonThermostat
 		// thermostatService.getCharacteristic(Characteristic.TargetTemperature).on("set", this.setTargetTemperature.bind(this));
 		this.thermostatService.setCharacteristic(Characteristic.TemperatureDisplayUnits, 1);
 		this.thermostatService.addCharacteristic(Characteristic.CurrentFanState);
-		this.thermostatService.getCharacteristic(Characteristic.CurrentFanState).on('get', this.getFanMode.bind(this));
+		this.thermostatService.getCharacteristic(Characteristic.CurrentFanState).on('get', (f) => this.getFanMode(f));
 		this.thermostatService.getCharacteristic(Characteristic.CurrentTemperature).on('get', this.getCurrentTemperature.bind(this));
 		this.thermostatService.getCharacteristic(Characteristic.CoolingThresholdTemperature).on('get', this.getCoolSetPoint.bind(this));
 		this.thermostatService.getCharacteristic(Characteristic.CoolingThresholdTemperature).on('set', this.setCoolSetPoint.bind(this));
@@ -95,7 +88,7 @@ export class ISYThermostatAccessory extends ISYDeviceAccessory<InsteonThermostat
 		this.thermostatService.getCharacteristic(Characteristic.TargetHeatingCoolingState).on('get', this.getMode.bind(this));
 		this.thermostatService.getCharacteristic(Characteristic.TargetHeatingCoolingState).on('set', this.setHeatingCoolingMode.bind(this));
 		this.thermostatService.getCharacteristic(Characteristic.CurrentRelativeHumidity).on('get', this.getHumidity.bind(this));
-		
+
 		svcs.push(this.thermostatService);
 		// ThermostatService
 		//   .getCharacteristic(Characteristic.RotationSpeed)
@@ -108,8 +101,7 @@ export class ISYThermostatAccessory extends ISYDeviceAccessory<InsteonThermostat
 		this.logger(`Sending command to set cool set point to: ${newSetPoint}`);
 		if (Math.abs(newSetPoint - this.device.coolSetPoint) >= 1) {
 			this.device.updateCoolSetPoint(newSetPoint).handleWith(callback);
-		}
-		else {
+		} else {
 			this.logger(`Command does not change actual set point`);
 			callback();
 		}
@@ -121,8 +113,7 @@ export class ISYThermostatAccessory extends ISYDeviceAccessory<InsteonThermostat
 		if (Math.abs(newSetPoint - this.device.heatSetPoint) >= 1) {
 			this.device
 				.updateHeatSetPoint(newSetPoint).handleWith(callback);
-		}
-		else {
+		} else {
 			this.logger(`Command does not change actual set point`);
 			callback();
 		}
@@ -133,8 +124,7 @@ export class ISYThermostatAccessory extends ISYDeviceAccessory<InsteonThermostat
 		if (mode !== this.device.mode) {
 			this.device
 				.updateMode(mode).handleWith(callback);
-		}
-		else {
+		} else {
 			this.logger(`Command does not change actual mode`);
 			callback();
 		}

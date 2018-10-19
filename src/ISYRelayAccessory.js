@@ -24,9 +24,6 @@ class ISYRelayAccessory extends ISYDeviceAccessory_1.ISYDeviceAccessory {
     handleExternalChange(propertyName, value, formattedValue) {
         super.handleExternalChange(propertyName, value, formattedValue);
         this.lightService.updateCharacteristic(plugin_1.Characteristic.On, this.device.isOn);
-        if (this.dimmable) {
-            this.lightService.updateCharacteristic(plugin_1.Characteristic.Brightness, this.device.brightnessLevel);
-        }
     }
     // Handles request to get the current on state
     // Handles request to get the current on state
@@ -52,15 +49,10 @@ class ISYRelayAccessory extends ISYDeviceAccessory_1.ISYDeviceAccessory {
     // Returns the set of services supported by this object.
     getServices() {
         super.getServices();
-        const lightBulbService = new plugin_1.Service.Lightbulb();
-        this.lightService = lightBulbService;
-        lightBulbService.getCharacteristic(plugin_1.Characteristic.On).on('set', this.setPowerState.bind(this));
-        lightBulbService.getCharacteristic(plugin_1.Characteristic.On).on('get', this.getPowerState.bind(this));
-        if (this.dimmable) {
-            lightBulbService.addCharacteristic(plugin_1.Characteristic.Brightness).on('get', this.getBrightness.bind(this));
-            lightBulbService.getCharacteristic(plugin_1.Characteristic.Brightness).on('set', this.setBrightness.bind(this));
-        }
-        return [this.informationService, lightBulbService];
+        this.primaryService = new plugin_1.Service.Switch();
+        this.primaryService.getCharacteristic(plugin_1.Characteristic.On).on('set', this.setPowerState.bind(this));
+        this.primaryService.getCharacteristic(plugin_1.Characteristic.On).on('get', this.getPowerState.bind(this));
+        return [this.informationService, this.primaryService];
     }
 }
 exports.ISYRelayAccessory = ISYRelayAccessory;

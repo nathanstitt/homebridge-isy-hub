@@ -24,6 +24,7 @@ export class ISYAccessory<T extends ISYNode> extends Accessory {
 	}
 	public getServices(): HAPNodeJS.Service[] {
 		const informationService = new Service.AccessoryInformation();
+	
 		informationService
 			.setCharacteristic(Characteristic.Manufacturer, 'Insteon')
 			.setCharacteristic(Characteristic.Model, this.device.productName === undefined ? this.device.name : this.device.productName)

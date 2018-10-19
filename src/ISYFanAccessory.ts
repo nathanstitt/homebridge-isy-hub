@@ -125,7 +125,7 @@ export class ISYFanAccessory extends ISYDeviceAccessory<InsteonFanDevice> {
 		const s = super.getServices();
 		const fanService = new Service.Fan();
 		this.fanService = fanService;
-		const lightService = new Service.Lightbulb();
+		const lightService = new Service.Lightbulb(this.device.name + " - Light");
 		this.lightService = lightService;
 		fanService.getCharacteristic(Characteristic.On).on('set', this.setFanOnState.bind(this));
 		fanService.getCharacteristic(Characteristic.On).on('get', this.getFanOnState.bind(this));
