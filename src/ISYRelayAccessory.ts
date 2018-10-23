@@ -1,4 +1,5 @@
 import { InsteonDimmableDevice, InsteonRelayDevice } from 'isy-js';
+
 import { ISYDeviceAccessory } from './ISYDeviceAccessory';
 import { Characteristic, Service } from './plugin';
 
@@ -23,7 +24,7 @@ export class ISYRelayAccessory<T extends InsteonRelayDevice> extends ISYDeviceAc
 	// Mirrors change in the state of the underlying isj-js device object.
 	public handleExternalChange(propertyName, value, formattedValue) {
 		super.handleExternalChange(propertyName, value, formattedValue);
-		this.lightService.updateCharacteristic(Characteristic.On, this.device.isOn);
+		this.primaryService.updateCharacteristic(Characteristic.On, this.device.isOn);
 	}
 	// Handles request to get the current on state
 	// Handles request to get the current on state

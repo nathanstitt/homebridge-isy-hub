@@ -1,6 +1,6 @@
-import { InsteonDimmableDevice, InsteonRelayDevice } from 'isy-js';
+import { InsteonDimmableDevice } from 'isy-js';
 import { ISYRelayAccessory } from 'ISYRelayAccessory';
-import { ISYDeviceAccessory } from './ISYDeviceAccessory';
+
 import { Characteristic, Service } from './plugin';
 
 export class ISYDimmableAccessory<T extends InsteonDimmableDevice> extends ISYRelayAccessory<T> {
@@ -17,7 +17,7 @@ export class ISYDimmableAccessory<T extends InsteonDimmableDevice> extends ISYRe
 		super.handleExternalChange(propertyName, value, formattedValue);
 		// this.lightService.updateCharacteristic(Characteristic.On, this.device.isOn);
 
-		this.lightService.updateCharacteristic(Characteristic.Brightness, this.device.brightnessLevel);
+		this.primaryService.updateCharacteristic(Characteristic.Brightness, this.device.brightnessLevel);
 
 	}
 	// Handles request to get the current on state

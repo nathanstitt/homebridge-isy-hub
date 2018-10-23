@@ -23,7 +23,7 @@ class ISYRelayAccessory extends ISYDeviceAccessory_1.ISYDeviceAccessory {
     // Mirrors change in the state of the underlying isj-js device object.
     handleExternalChange(propertyName, value, formattedValue) {
         super.handleExternalChange(propertyName, value, formattedValue);
-        this.lightService.updateCharacteristic(plugin_1.Characteristic.On, this.device.isOn);
+        this.primaryService.updateCharacteristic(plugin_1.Characteristic.On, this.device.isOn);
     }
     // Handles request to get the current on state
     // Handles request to get the current on state

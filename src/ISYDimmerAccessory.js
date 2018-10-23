@@ -12,7 +12,7 @@ class ISYDimmableAccessory extends ISYRelayAccessory_1.ISYRelayAccessory {
     handleExternalChange(propertyName, value, formattedValue) {
         super.handleExternalChange(propertyName, value, formattedValue);
         // this.lightService.updateCharacteristic(Characteristic.On, this.device.isOn);
-        this.lightService.updateCharacteristic(plugin_1.Characteristic.Brightness, this.device.brightnessLevel);
+        this.primaryService.updateCharacteristic(plugin_1.Characteristic.Brightness, this.device.brightnessLevel);
     }
     // Handles request to get the current on state
     // Handles request to get the current on state
