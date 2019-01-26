@@ -4,6 +4,52 @@
 
 (C) Rod Toll 2015-2017, Licensed under the MIT-LICENSE. Additional development work by pradeepmouli, 2018-
 
+# Major Updates
+
+Requires new version of [isy-js](https://github.com/pradeepmouli/isy-js.git). Please see revised installation notes below.
+
+### New Functionality:
+
+- Support for ISY 5.0.12+
+- Support for additional devices:
+     Insteon Thermostat/Thermostat Adapters
+     Leak Sensors
+     Remotes
+
+### Bug Fixes:
+
+- More robust handling for device status changes from ISY and sending updates to ISY
+
+### Known Issues:
+
+- ELK devices currently not working (Z-Wave devices might). Please disable ELK devices to use this version (set "elkEnabled" = false). If you would like to help fix, (I need someone to test), please reach out to me.
+
+### TODO:
+
+- Re-add support for non-insteon native devices (Elk & ZWave) 
+- Add Program/Variable support
+- Incorporate individual device status in scene definitions
+- Create configurable mappings for IOLinc to other types of accessories (e.g. curtains & sprinkler control).
+
+### Future Work:
+
+- Add NodeServer support. May implement or may implement in ISY-JS only, as using native homebridge plugins may be better solution. E.g. for nest devices, you would use a Nest NodeServer to integrate with the ISY, and the Nest homebridge plugin to integrate with HomeKit.
+
+-----------
+
+## Installation
+
+1. Install homebridge using: npm install -g homebridge
+2. Install this plugin using: npm install -g github:pradeepmouli/homebridge-isy-js 
+3. Install ISY-JS v5 (should happen automatically during step #2, but just in case): npm install -g github:pradeepmouli/isy-js 
+4. Update your configuration file. See sampleconfig.json in this repository for a sample. 
+
+Please note, that since npm.org is not updated, running npm -g install or npm -g update (for all packages, homebridge-isy-js or isy-js) will corrupt your installation.
+
+--------
+
+# Old Readme
+
 ISY-994 REST / WebSockets based HomeBridge platform. 
 
 NOTE: Homebridge-isy-js now includes support for garage door openers. Make sure you ensure a garage door is clear before closing it.
@@ -15,17 +61,11 @@ Turns out that HomeBridge platforms can only return a maximum of 100 devices. So
 software will fail adding the HomeBridge to your HomeKit network. To address this issue this platform provides an option to screen out devices based on 
 criteria specified in the config. 
 
-# Requirements
+## Requirements
 
-Only the ISY 994 and newer devices are supported. The ISY 99i device is no longer supported as this library depends on a later version of the REST/Websocket interface. 
+Only the ISY 994 and newer devices running 5.0.12+ are supported. The ISY 99i device is no longer supported as this library depends on a later version of the REST/Websocket interface. 
 
-# Installation
-
-1. Install homebridge using: npm install -g homebridge
-2. Install this plugin using: npm install -g homebridge-isy-js
-3. Update your configuration file. See sampleconfig.json in this repository for a sample. 
-
-# Configuration
+## Configuration
 
 Configuration sample:
 
@@ -90,7 +130,7 @@ Examples:
 { "nameContains": "", "lastAddressDigit": "", "address": "15 5 3 2"} - Ignore the device with an ISY address of 15 5 3 2.
 ```
 
-# Implementation Notes
+## Implementation Notes
 
 * Scenes will not show as on until all light devices are on. This allows the UI to send an 'on' request to light up the rßest of them.
 * Garage door openers (in this case an I/O Linc used in a garage kit) are complex to get correct. We only have the current state of the contact
@@ -98,7 +138,9 @@ Examples:
  the code will likely get the state incorrect. If you get into this state, close the garage door and restart homebridge. The garage door is assumed open at startup and closed at startup if the contact sensor
  says the door is open or closed respectively.
 
- # History
+-----------
+
+# History
 
  * 0.2.0 - Development resumed.
     - Support for v5.0.12+
