@@ -8,7 +8,7 @@ export class ISYRelayAccessory<T extends InsteonRelayDevice> extends ISYDeviceAc
 
     constructor(log, device: T) {
         super(log, device);
-        this.dimmable = device instanceof InsteonDimmableDevice;
+        this.dimmable = device.isDimmable;
     }
     // Handles the identify command
     // Handles request to set the current powerstate from homekit. Will ignore redundant commands.

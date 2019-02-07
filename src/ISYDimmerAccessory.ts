@@ -1,6 +1,5 @@
 import { InsteonDimmableDevice } from 'isy-hub';
-import { ISYRelayAccessory } from 'ISYRelayAccessory';
-
+import { ISYRelayAccessory } from './ISYRelayAccessory';
 import { Characteristic, Service } from './plugin';
 
 export class ISYDimmableAccessory<T extends InsteonDimmableDevice> extends ISYRelayAccessory<T> {

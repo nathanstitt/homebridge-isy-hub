@@ -1,6 +1,11 @@
 import { IgnoreDeviceRule } from 'config';
 import { API } from 'homebridge';
-import { ElkAlarmSensorDevice, InsteonDoorWindowSensorDevice, InsteonFanDevice, InsteonLockDevice, InsteonMotionSensorDevice, InsteonOutletDevice, InsteonRelayDevice, InsteonThermostatDevice, ISY, ISYNode, NodeTypes } from 'isy-hub';
+import {
+    ElkAlarmSensorDevice, InsteonDoorWindowSensorDevice, InsteonFanDevice, InsteonLockDevice,
+    InsteonMotionSensorDevice, InsteonOutletDevice, InsteonRelayDevice, InsteonThermostatDevice,
+    InsteonDimmableDevice, ISY, ISYNode, NodeTypes,
+} from 'isy-hub';
+import { ISYDimmableAccessory } from './ISYDimmerAccessory';
 import { ISYDoorWindowSensorAccessory } from './ISYDoorWindowSensorAccessory';
 import { ISYElkAlarmPanelAccessory } from './ISYElkAlarmPanelAccessory';
 import { ISYFanAccessory } from './ISYFanAccessory';
@@ -179,7 +184,9 @@ export class ISYPlatform {
         });
     }
     public createAccessory(device) {
-        if (device instanceof InsteonRelayDevice) {
+        if (device instanceof InsteonDimmableDevice) {
+            return new ISYDimmableAccessory(this.logger.bind(this), device);
+        } else if (device instanceof InsteonRelayDevice) {
             return new ISYRelayAccessory(this.logger.bind(this), device);
         } else if (device instanceof InsteonLockDevice) {
             return new ISYLockAccessory(this.logger.bind(this), device);
