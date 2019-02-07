@@ -1,13 +1,13 @@
 {
-  "name": "homebridge-isy-js",
+  "name": "homebridge-isy-hub",
   "version": "0.2.5",
   "description": "Homebridge plugin for ISY series of home controllers from universal devices.",
   "note": "",
   "main": "./src/plugin.js",
   "scripts": {
     "test": "mocha",
-    "prepare": "tsc",
-    "start": "homebridge -D -P ./"
+    "prepare": "npm run build",
+    "build": "tsc"
   },
   "engines": {
     "node": ">8.0.0",
@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/pradeepmouli/homebridge-isy-js.git"
+    "url": "https://github.com/nathanstitt/homebridge-isy-hub.git"
   },
   "keywords": [
     "homebridge-plugin",
@@ -39,14 +39,23 @@
     "hap-nodejs": "",
     "homebridge": "^0.4.45",
     "homebridge-lib": "^1.0.9",
-    "isy-js": "git+https://github.com/pradeepmouli/isy-js.git#v5",
+    "isy-js": "git+https://github.com/nathanstitt/isy-hub.git",
     "restler": "^3.4.0",
     "xmldoc": "^1.1.2"
   },
+  "contributors": [
+    {
+      "name": "Rod Toll & Pradeep Mouli",
+      "email": "rod_toll@hotmail.com"
+    }, {
+      "name": "Nathan Stitt",
+      "email": "nathan@stitt.org"
+    }
+  ],
   "author": "pradeepmouli",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/pradeepmouli/homebridge-isy-js/issues"
+    "url": "https://github.com/nathanstitt/homebridge-isy-hub/issues"
   },
-  "homepage": "https://github.com/pradeepmouli/homebridge-isy-js"
+  "homepage": "https://github.com/nathanstitt/homebridge-isy-hub"
 }

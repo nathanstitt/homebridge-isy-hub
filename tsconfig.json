@@ -1,21 +1,14 @@
 {
-    "compileOnSave": true,
-    "compilerOptions": {
-        "target": "es2018",
-        "emitDecoratorMetadata": true,
-        //"outFile": "../lib/index.js",
-    
-        "module": "commonjs",
-        "esModuleInterop": true,
-        "baseUrl": "./src",
-        "paths": {
-            "hap-nodejs": ["../typings/hap.d.ts"],
-            "config":["../typings/config.d.ts"]
-        },
-        "experimentalDecorators": true,
- 
-        "sourceMap": false,
-        "allowSyntheticDefaultImports": true
-    }
-   
+  "compileOnSave": true,
+  "compilerOptions": {
+    "target": "es2018",
+    "emitDecoratorMetadata": true,
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "baseUrl": "./src",
+    "outDir": "./dist",
+    "experimentalDecorators": true,
+    "sourceMap": false,
+    "allowSyntheticDefaultImports": true
+  }
 }

@@ -10,8 +10,8 @@
 
     "platforms": [
         {
-            "platform": "isy-js",
-            "name": "isy-js",
+            "platform": "isy-hub",
+            "name": "isy-hub",
             "host": "<<IP Address>>",
             "username": "admin",
             "password": "<<PAssword>>",
@@ -19,18 +19,18 @@
             "debugLoggingEnabled": false,
             "ignoreDevices": [
                 { "nameContains": "ApplianceLinc", "lastAddressDigit": "", "address": ""},
-                { "nameContains": "S -", "lastAddressDigit": "", "address": ""},                
-                { "nameContains": "ApplianceLink", "lastAddressDigit": "", "address": ""},                
+                { "nameContains": "S -", "lastAddressDigit": "", "address": ""},
+                { "nameContains": "ApplianceLink", "lastAddressDigit": "", "address": ""},
                 { "nameContains": "Bedroom.Side Gate", "lastAddressDigit": "", "address": ""},
                 { "nameContains": "Unused", "lastAddressDigit": "", "address": "" },
-                { "nameContains": "Remote", "lastAddressDigit": "", "address": "" },    
+                { "nameContains": "Remote", "lastAddressDigit": "", "address": "" },
                 { "nameContains": "Keypad", "lastAddressDigit": "2", "address": "" },
-                { "nameContains": "Keypad", "lastAddressDigit": "3", "address": "" },                                      
-                { "nameContains": "Keypad", "lastAddressDigit": "4", "address": "" },                                     
-                { "nameContains": "Keypad", "lastAddressDigit": "5", "address": "" },     
-                { "nameContains": "Keypad", "lastAddressDigit": "6", "address": "" },                                                                                          
-                { "nameContains": "Keypad", "lastAddressDigit": "7", "address": "" },                                                                                          
-                { "nameContains": "Keypad", "lastAddressDigit": "8", "address": "" }                                                                                                                                                                                              
+                { "nameContains": "Keypad", "lastAddressDigit": "3", "address": "" },
+                { "nameContains": "Keypad", "lastAddressDigit": "4", "address": "" },
+                { "nameContains": "Keypad", "lastAddressDigit": "5", "address": "" },
+                { "nameContains": "Keypad", "lastAddressDigit": "6", "address": "" },
+                { "nameContains": "Keypad", "lastAddressDigit": "7", "address": "" },
+                { "nameContains": "Keypad", "lastAddressDigit": "8", "address": "" }
             ]
         }
     ],
