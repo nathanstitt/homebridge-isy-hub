@@ -1,4 +1,4 @@
-import { ElkAlarmSensorDevice } from 'isy-js';
+import { ElkAlarmSensorDevice } from 'isy-hub';
 import { ISYAccessory } from './ISYAccessory';
 import { Characteristic, Service } from './plugin';
 export class ISYElkAlarmPanelAccessory extends ISYAccessory<ElkAlarmSensorDevice> {

@@ -1,4 +1,4 @@
-import { InsteonLockDevice } from 'isy-js';
+import { InsteonLockDevice } from 'isy-hub';
 import { ISYDeviceAccessory } from './ISYDeviceAccessory';
 import { Characteristic, Service } from './plugin';
 
@@ -33,7 +33,7 @@ export class ISYLockAccessory extends ISYDeviceAccessory<InsteonLockDevice> {
     public getTargetLockState(callback) {
         this.getLockCurrentState(callback);
     }
-    // Mirrors change in the state of the underlying isy-js device object.
+    // Mirrors change in the state of the underlying isy-hub device object.
     public handleExternalChange(propertyName, value, formattedValue) {
         this.lockService.updateCharacteristic(Characteristic.LockTargetState, this.getDeviceCurrentStateAsHK());
         this.lockService.updateCharacteristic(Characteristic.LockCurrentState, this.getDeviceCurrentStateAsHK());

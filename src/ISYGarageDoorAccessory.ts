@@ -1,4 +1,4 @@
-import { InsteonRelayDevice } from 'isy-js';
+import { InsteonRelayDevice } from 'isy-hub';
 import { ISYAccessory } from './ISYAccessory';
 import { Characteristic, Service } from './plugin';
 export class ISYGarageDoorAccessory extends ISYAccessory<InsteonRelayDevice> {

@@ -1,9 +1,9 @@
 {
   "name": "homebridge-isy-hub",
-  "version": "0.2.5",
+  "version": "0.1.0",
   "description": "Homebridge plugin for ISY series of home controllers from universal devices.",
   "note": "",
-  "main": "./src/plugin.js",
+  "main": "./dist/plugin.js",
   "scripts": {
     "test": "mocha",
     "prepare": "npm run build",
@@ -39,7 +39,7 @@
     "hap-nodejs": "",
     "homebridge": "^0.4.45",
     "homebridge-lib": "^1.0.9",
-    "isy-js": "git+https://github.com/nathanstitt/isy-hub.git",
+    "isy-hub": "git+https://github.com/nathanstitt/isy-hub.git",
     "restler": "^3.4.0",
     "xmldoc": "^1.1.2"
   },
@@ -47,7 +47,8 @@
     {
       "name": "Rod Toll & Pradeep Mouli",
       "email": "rod_toll@hotmail.com"
-    }, {
+    },
+    {
       "name": "Nathan Stitt",
       "email": "nathan@stitt.org"
     }

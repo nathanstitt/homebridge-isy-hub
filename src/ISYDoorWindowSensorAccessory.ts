@@ -1,4 +1,4 @@
-import { InsteonDoorWindowSensorDevice } from 'isy-js';
+import { InsteonDoorWindowSensorDevice } from 'isy-hub';
 import { ISYDeviceAccessory } from './ISYDeviceAccessory';
 import { Characteristic, Service } from './plugin';
 

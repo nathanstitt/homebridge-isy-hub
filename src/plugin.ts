@@ -31,5 +31,5 @@ export default (homebridge: API) => {
     Hap = homebridge.hap;
     Service = Hap.Service;
     const api = homebridge;
-    api.registerPlatform(`homebridge-isy-js`, 'isy-js', ISYPlatform);
+    api.registerPlatform(`homebridge-isy-hub`, 'isy-hub', ISYPlatform);
 };

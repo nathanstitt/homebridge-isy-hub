@@ -9,6 +9,10 @@
     "outDir": "./dist",
     "experimentalDecorators": true,
     "sourceMap": false,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "paths": {
+      "hap-nodejs": ["../typings/hap.d.ts"],
+      "config":["../typings/config.d.ts"]
+    }
   }
 }

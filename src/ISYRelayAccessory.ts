@@ -1,4 +1,4 @@
-import { InsteonDimmableDevice, InsteonRelayDevice } from 'isy-js';
+import { InsteonDimmableDevice, InsteonRelayDevice } from 'isy-hub';
 
 import { ISYDeviceAccessory } from './ISYDeviceAccessory';
 import { Characteristic, Service } from './plugin';

@@ -1,6 +1,6 @@
 import 'hap-nodejs';
 
-import { InsteonFanDevice } from 'isy-js';
+import { InsteonFanDevice } from 'isy-hub';
 
 import { ISYDeviceAccessory } from './ISYDeviceAccessory';
 
@@ -15,8 +15,8 @@ export class ISYFanAccessory extends ISYDeviceAccessory<InsteonFanDevice> {
         super(log, device);
         // this.logger(JSON.stringify(this.device.scenes[0]));
     }
-    // Translates the fan level from homebridge into the isy-js level. Maps from the 0-100
-    // to the four isy-js fan speed levels.
+    // Translates the fan level from homebridge into the isy-hub level. Maps from the 0-100
+    // to the four isy-hub fan speed levels.
     public translateHKToFanSpeed(fanStateHK) {
         if (fanStateHK === 0) {
             return 0;
@@ -32,12 +32,12 @@ export class ISYFanAccessory extends ISYDeviceAccessory<InsteonFanDevice> {
 
         }
     }
-    // Returns the current state of the fan from the isy-js level to the 0-100 level of HK.
+    // Returns the current state of the fan from the isy-hub level to the 0-100 level of HK.
     public getFanRotationSpeed(callback) {
         this.logger(`Getting fan rotation speed. Device says: ${this.device.fanSpeed} translation says: ${this.device.fanSpeed}`);
         callback(null, this.device.fanSpeed);
     }
-    // Sets the current state of the fan from the 0-100 level of HK to the isy-js level.
+    // Sets the current state of the fan from the 0-100 level of HK to the isy-hub level.
     public setFanRotationSpeed(fanStateHK, callback) {
         this.logger(`Sending command to set fan state (pre-translate) to: ${fanStateHK}`);
         const newFanState = this.translateHKToFanSpeed(fanStateHK);
@@ -114,10 +114,10 @@ export class ISYFanAccessory extends ISYDeviceAccessory<InsteonFanDevice> {
         this.fanService.updateCharacteristic(Characteristic.RotationSpeed, this.device.fanSpeed);
         // this.logger("" + this.device.name + " Handling external change for light");
         // this.lightService
-        // 	.updateCharacteristic(Characteristic.On, this.device.getCurrentLightState());
+        //      .updateCharacteristic(Characteristic.On, this.device.getCurrentLightState());
         // if (this.dimmable) {
-        // 	this.lightService
-        // 		.updateCharacteristic(Characteristic.Brightness, this.device.getCurrentLightDimState());
+        //      this.lightService
+        //              .updateCharacteristic(Characteristic.Brightness, this.device.getCurrentLightDimState());
         // }
     }
     // Returns the services supported by the fan device.

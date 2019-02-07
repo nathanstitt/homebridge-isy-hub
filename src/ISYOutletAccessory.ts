@@ -1,4 +1,4 @@
-import { InsteonOutletDevice } from 'isy-js';
+import { InsteonOutletDevice } from 'isy-hub';
 import { ISYDeviceAccessory } from './ISYDeviceAccessory';
 import { Characteristic, Service } from './plugin';
 export class ISYOutletAccessory extends ISYDeviceAccessory<InsteonOutletDevice> {
@@ -19,7 +19,7 @@ export class ISYOutletAccessory extends ISYDeviceAccessory<InsteonOutletDevice> 
             callback();
         }
     }
-    // Handles a request to get the current outlet state based on underlying isy-js device object.
+    // Handles a request to get the current outlet state based on underlying isy-hub device object.
     public getOutletState(callback) {
         callback(null, this.device.isOn);
     }

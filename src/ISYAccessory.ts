@@ -1,5 +1,5 @@
-import {Accessory} from 'hap-nodejs';
-import { Controls, ISYNode } from 'isy-js';
+import { Accessory } from 'hap-nodejs';
+import { Controls, ISYNode } from 'isy-hub';
 import { Characteristic, Service, UUIDGen } from './plugin';
 export class ISYAccessory<T extends ISYNode> extends Accessory {
     [x: string]: any;

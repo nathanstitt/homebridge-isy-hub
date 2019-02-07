@@ -1,6 +1,6 @@
 import { IgnoreDeviceRule } from 'config';
 import { API } from 'homebridge';
-import { ElkAlarmSensorDevice, InsteonDoorWindowSensorDevice, InsteonFanDevice, InsteonLockDevice, InsteonMotionSensorDevice, InsteonOutletDevice, InsteonRelayDevice, InsteonThermostatDevice, ISY, ISYNode, NodeTypes } from 'isy-js';
+import { ElkAlarmSensorDevice, InsteonDoorWindowSensorDevice, InsteonFanDevice, InsteonLockDevice, InsteonMotionSensorDevice, InsteonOutletDevice, InsteonRelayDevice, InsteonThermostatDevice, ISY, ISYNode, NodeTypes } from 'isy-hub';
 import { ISYDoorWindowSensorAccessory } from './ISYDoorWindowSensorAccessory';
 import { ISYElkAlarmPanelAccessory } from './ISYElkAlarmPanelAccessory';
 import { ISYFanAccessory } from './ISYFanAccessory';
@@ -128,7 +128,7 @@ export class ISYPlatform {
         }
         return deviceName;
     }
-    // Calls the isy-js library, retrieves the list of devices, and maps them to appropriate ISYXXXXAccessory devices.
+    // Calls the isy-hub library, retrieves the list of devices, and maps them to appropriate ISYXXXXAccessory devices.
     public accessories(callback) {
         const that = this;
         this.isy.initialize(() => {

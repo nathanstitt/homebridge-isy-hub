@@ -1,4 +1,4 @@
-import { InsteonThermostatDevice, Props } from 'isy-js';
+import { InsteonThermostatDevice, Props } from 'isy-hub';
 import { ISYDeviceAccessory } from './ISYDeviceAccessory';
 import { Characteristic, Service } from './plugin';
 export class ISYThermostatAccessory extends ISYDeviceAccessory<InsteonThermostatDevice> {
@@ -42,7 +42,7 @@ export class ISYThermostatAccessory extends ISYDeviceAccessory<InsteonThermostat
         this.logger(`Getting Current Rel. Humidity - Device says: ${this.device.humidity}`);
         callback(null, this.device.humidity);
     }
-    // Mirrors change in the state of the underlying isy-js device object.
+    // Mirrors change in the state of the underlying isy-hub device object.
     public handleExternalChange(propertyName, value, formattedValue) {
         super.handleExternalChange(propertyName, value, formattedValue);
         switch (propertyName) {
