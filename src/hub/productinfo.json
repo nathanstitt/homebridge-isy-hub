@@ -91,6 +91,13 @@
         "connectionType": "Insteon Wired",
         "batteryOperated": false
     }, {
+        "type": "1.12.44.0",
+        "address": "",
+        "name": "(2486DWH8) KeypadLinc Dimmer 8 Buttons v.2C",
+        "deviceType": "DimmableLight",
+        "connectionType": "Insteon Wired",
+        "batteryOperated": false
+    }, {
         "type": "1.27.54.0",
         "address": "",
         "name": "(2486D) KeypadLinc Dimmer 6 Buttons v.36",
