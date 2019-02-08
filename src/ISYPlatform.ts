@@ -1,20 +1,11 @@
 import { IgnoreDeviceRule } from 'config';
 import { API } from 'homebridge';
-import {
-    InsteonDoorWindowSensorDevice, InsteonFanDevice, InsteonLockDevice,
-    InsteonMotionSensorDevice, InsteonOutletDevice, InsteonRelayDevice, InsteonThermostatDevice,
-    InsteonDimmableDevice, ISY, ISYNode, NodeTypes,
-} from './hub';
-import { ISYDimmableAccessory } from './ISYDimmerAccessory';
-import { ISYDoorWindowSensorAccessory } from './ISYDoorWindowSensorAccessory';
-import { ISYFanAccessory } from './ISYFanAccessory';
+import { DeviceHandlers } from './DeviceHandlers';
 import { ISYGarageDoorAccessory } from './ISYGarageDoorAccessory';
-import { ISYLockAccessory } from './ISYLockAccessory';
-import { ISYMotionSensorAccessory } from './ISYMotionSensorAccessory';
-import { ISYOutletAccessory } from './ISYOutletAccessory';
-import { ISYRelayAccessory } from './ISYRelayAccessory';
 import { ISYSceneAccessory } from './ISYSceneAccessory';
-import { ISYThermostatAccessory } from './ISYThermostatAccessory';
+import { ISY, ISYNode, NodeTypes } from './hub';
+
+
 export class ISYPlatform {
     public log: any;
     public config: any;
@@ -171,23 +162,30 @@ export class ISYPlatform {
         });
     }
     public createAccessory(device) {
-        if (device instanceof InsteonDimmableDevice) {
-            return new ISYDimmableAccessory(this.logger.bind(this), device);
-        } else if (device instanceof InsteonRelayDevice) {
-            return new ISYRelayAccessory(this.logger.bind(this), device);
-        } else if (device instanceof InsteonLockDevice) {
-            return new ISYLockAccessory(this.logger.bind(this), device);
-        } else if (device instanceof InsteonOutletDevice) {
-            return new ISYOutletAccessory(this.logger.bind(this), device);
-        } else if (device instanceof InsteonFanDevice) {
-            return new ISYFanAccessory(this.logger.bind(this), device);
-        } else if (device instanceof InsteonDoorWindowSensorDevice) {
-            return new ISYDoorWindowSensorAccessory(this.logger.bind(this), device);
-        } else if (device instanceof InsteonMotionSensorDevice) {
-            return new ISYMotionSensorAccessory(this.logger.bind(this), device);
-        } else if (device instanceof InsteonThermostatDevice) {
-            return new ISYThermostatAccessory(this.logger.bind(this), device);
+        const Accessory = DeviceHandlers[device.deviceType];
+        if (Accessory) {
+            return new Accessory(this.logger.bind(this), device);
         }
         return null;
+
+        // if (device instanceof InsteonDimmableDevice) {
+        //     return new ISYDimmableAccessory(this.logger.bind(this), device);
+        // } else if(device instanceof InsteonRelayDevice) {
+        // return new ISYRelayAccessory(this.logger.bind(this), device);
+        // } else if (device instanceof InsteonLockDevice) {
+        //     return new ISYLockAccessory(this.logger.bind(this), device);
+        // } else if(device instanceof InsteonOutletDevice) {
+        // return new ISYOutletAccessory(this.logger.bind(this), device);
+        // } else if(device instanceof InsteonFanDevice) {
+        // return new ISYFanAccessory(this.logger.bind(this), device);
+        // } else if(device instanceof InsteonDoorWindowSensorDevice) {
+        // return new ISYDoorWindowSensorAccessory(this.logger.bind(this), device);
+        // } else if(device instanceof InsteonMotionSensorDevice) {
+        // return new ISYMotionSensorAccessory(this.logger.bind(this), device);
+        //     } else if(device instanceof InsteonThermostatDevice) {
+        //     return new ISYThermostatAccessory(this.logger.bind(this), device);
+        // }
+        // return null;
+        //     }
     }
 }
