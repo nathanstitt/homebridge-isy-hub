@@ -1,7 +1,7 @@
-import { Accessory } from 'hap-nodejs';
 import { Controls, ISYNode } from './hub';
 import { Characteristic, Service, UUIDGen } from './plugin';
-export class ISYAccessory<T extends ISYNode> extends Accessory {
+
+export class ISYAccessory<T extends ISYNode> {
     [x: string]: any;
     public logger: (msg: any) => void;
     public device: T;
@@ -10,10 +10,7 @@ export class ISYAccessory<T extends ISYNode> extends Accessory {
     public informationService: HAPNodeJS.Service;
     public name: string;
     constructor(log, device: T) {
-        const s = UUIDGen.generate(device.isy.address + ':' + device.address + 1);
-        // if (s == 'd2621ae0-9859-4445-a190-2359f9acddbb') log(device.name);
-        super(device.name, s);
-        // super(device.name,hapNodeJS.uuid.generate(device.isy.address + ":" + device.address))
+        this.uuid_base = UUIDGen.generate(device.isy.address + ':' + device.address + 1);
         this.name = device.name;
         this.logger = (msg) => {
             log('Accessory ' + device.name + ': ' + msg);
