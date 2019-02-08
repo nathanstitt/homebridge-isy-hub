@@ -1,4 +1,4 @@
-import { InsteonLockDevice } from 'isy-hub';
+import { InsteonLockDevice } from './hub';
 import { ISYDeviceAccessory } from './ISYDeviceAccessory';
 import { Characteristic, Service } from './plugin';
 

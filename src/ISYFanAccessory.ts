@@ -1,11 +1,7 @@
 import 'hap-nodejs';
-
-import { InsteonFanDevice } from 'isy-hub';
-
+import { InsteonFanDevice } from './hub';
 import { ISYDeviceAccessory } from './ISYDeviceAccessory';
-
 import { Characteristic, Service } from './plugin';
-
 import './ISYPlatform';
 
 export class ISYFanAccessory extends ISYDeviceAccessory<InsteonFanDevice> {

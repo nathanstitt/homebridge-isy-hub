@@ -9,6 +9,7 @@
     "outDir": "./dist",
     "experimentalDecorators": true,
     "sourceMap": false,
+    "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "paths": {
       "hap-nodejs": ["../typings/hap.d.ts"],

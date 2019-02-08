@@ -1,4 +1,4 @@
-import { InsteonBaseDevice } from 'isy-hub';
+import { InsteonBaseDevice } from './hub';
 import { ISYAccessory } from './ISYAccessory';
 
 export class ISYDeviceAccessory<T extends InsteonBaseDevice> extends ISYAccessory<T> {

@@ -1,4 +1,4 @@
-import { InsteonThermostatDevice, Props } from 'isy-hub';
+import { InsteonThermostatDevice, Props } from './hub';
 import { ISYDeviceAccessory } from './ISYDeviceAccessory';
 import { Characteristic, Service } from './plugin';
 export class ISYThermostatAccessory extends ISYDeviceAccessory<InsteonThermostatDevice> {

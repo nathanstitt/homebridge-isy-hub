@@ -1,4 +1,4 @@
-import { InsteonDimmableDevice } from 'isy-hub';
+import { InsteonDimmableDevice } from './hub';
 import { ISYRelayAccessory } from './ISYRelayAccessory';
 import { Characteristic, Service } from './plugin';
 

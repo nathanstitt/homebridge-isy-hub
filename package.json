@@ -31,16 +31,16 @@
     "babel-preset-typescript": "",
     "fake-isy-994i": "",
     "mocha": "",
-    "@types/node": "^10.11.0",
-    "@types/restler": ""
+    "@types/node": "^10.11.0"
   },
   "dependencies": {
     "faye-websocket": "",
     "hap-nodejs": "",
     "homebridge": "^0.4.45",
     "homebridge-lib": "^1.0.9",
-    "isy-hub": "git+https://github.com/nathanstitt/isy-hub.git",
     "restler": "^3.4.0",
+    "restler-base": "^3.4.6",
+    "xml2js": "^0.4.19",
     "xmldoc": "^1.1.2"
   },
   "contributors": [

@@ -1,4 +1,4 @@
-import { ISYScene } from 'isy-hub';
+import { ISYScene } from './hub';
 import { ISYAccessory } from './ISYAccessory';
 import { Characteristic, Service } from './plugin';
 

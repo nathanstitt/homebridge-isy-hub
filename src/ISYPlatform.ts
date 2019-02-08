@@ -1,13 +1,12 @@
 import { IgnoreDeviceRule } from 'config';
 import { API } from 'homebridge';
 import {
-    ElkAlarmSensorDevice, InsteonDoorWindowSensorDevice, InsteonFanDevice, InsteonLockDevice,
+    InsteonDoorWindowSensorDevice, InsteonFanDevice, InsteonLockDevice,
     InsteonMotionSensorDevice, InsteonOutletDevice, InsteonRelayDevice, InsteonThermostatDevice,
     InsteonDimmableDevice, ISY, ISYNode, NodeTypes,
-} from 'isy-hub';
+} from './hub';
 import { ISYDimmableAccessory } from './ISYDimmerAccessory';
 import { ISYDoorWindowSensorAccessory } from './ISYDoorWindowSensorAccessory';
-import { ISYElkAlarmPanelAccessory } from './ISYElkAlarmPanelAccessory';
 import { ISYFanAccessory } from './ISYFanAccessory';
 import { ISYGarageDoorAccessory } from './ISYGarageDoorAccessory';
 import { ISYLockAccessory } from './ISYLockAccessory';
@@ -22,7 +21,6 @@ export class ISYPlatform {
     public host: string;
     public username: string;
     public password: string;
-    public elkEnabled: boolean;
     public debugLoggingEnabled: boolean;
     public includeAllScenes: boolean;
     public includedScenes: [];
@@ -34,12 +32,11 @@ export class ISYPlatform {
         this.host = config.host;
         this.username = config.username;
         this.password = config.password;
-        this.elkEnabled = config.elkEnabled;
         this.debugLoggingEnabled = config.debugLoggingEnabled === undefined ? false : config.debugLoggingEnabled;
         this.includeAllScenes = config.includeAllScenes === undefined ? false : config.includeAllScenes;
         this.includedScenes = config.includedScenes === undefined ? [] : config.includedScenes;
         this.ignoreRules = config.ignoreDevices;
-        this.isy = new ISY(this.host, this.username, this.password, config.elkEnabled, null, config.useHttps, true, this.debugLoggingEnabled, null, log);
+        this.isy = new ISY(this.host, this.username, this.password, null, config.useHttps, true, this.debugLoggingEnabled, null, log);
     }
     public logger(msg: string) {
         if (this.debugLoggingEnabled || (process.env.ISYJSDEBUG !== undefined && process.env.IYJSDEBUG !== null)) {
@@ -168,17 +165,7 @@ export class ISYPlatform {
                     results.push(new ISYSceneAccessory(this.logger.bind(this), scene));
                 }
             }
-            if (that.isy.elkEnabled) {
-                if (results.length >= 100) {
-                    that.logger('Skipping adding Elk Alarm panel as device count already at maximum');
-                } else {
-                    const panelDevice = that.isy.getElkAlarmPanel();
-                    panelDevice.name = that.renameDeviceIfNeeded(panelDevice);
-                    const panelDeviceHK = new ISYElkAlarmPanelAccessory(that.log, panelDevice);
-                    // deviceMap[panelDevice.address] = panelDeviceHK;
-                    results.push(panelDeviceHK);
-                }
-            }
+
             that.logger(`Filtered device list has: ${results.length} devices`);
             callback(results);
         });
@@ -196,8 +183,6 @@ export class ISYPlatform {
             return new ISYFanAccessory(this.logger.bind(this), device);
         } else if (device instanceof InsteonDoorWindowSensorDevice) {
             return new ISYDoorWindowSensorAccessory(this.logger.bind(this), device);
-        } else if (device instanceof ElkAlarmSensorDevice) {
-            return new ISYElkAlarmPanelAccessory(this.logger.bind(this), device);
         } else if (device instanceof InsteonMotionSensorDevice) {
             return new ISYMotionSensorAccessory(this.logger.bind(this), device);
         } else if (device instanceof InsteonThermostatDevice) {

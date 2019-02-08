@@ -7,6 +7,9 @@ Renamed and additional device support by Nathan Stitt
 This is basically a fork of homebridge-isy-js as implemented by Rod Toll and pradeepmouli
 with added support for a few devices that I needed, namely the 2475 InLineLink Dimmer.
 
+It integrates the isy-js communication library so they can be developed together and
+drops support for ELK alarm panels
+
 I renamed the project to homebridge-isy-hub so I could publish to NPM for easily deployment
 to my network
 

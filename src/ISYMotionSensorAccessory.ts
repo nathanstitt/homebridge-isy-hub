@@ -1,6 +1,7 @@
-import { InsteonMotionSensorDevice } from 'isy-hub';
+import { InsteonMotionSensorDevice } from './hub';
 import { ISYDeviceAccessory } from './ISYDeviceAccessory';
 import { Characteristic, Service } from './plugin';
+
 export class ISYMotionSensorAccessory extends ISYDeviceAccessory<InsteonMotionSensorDevice> {
     public sensorService: any;
     constructor(log, device) {

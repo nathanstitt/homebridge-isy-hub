@@ -1,4 +1,4 @@
-import { InsteonOutletDevice } from 'isy-hub';
+import { InsteonOutletDevice } from './hub';
 import { ISYDeviceAccessory } from './ISYDeviceAccessory';
 import { Characteristic, Service } from './plugin';
 export class ISYOutletAccessory extends ISYDeviceAccessory<InsteonOutletDevice> {
