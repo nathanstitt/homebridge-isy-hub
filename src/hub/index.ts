@@ -502,6 +502,7 @@ export class ISY {
 
 
     public finishInitialize(success, initializeCompleted) {
+        this.logger(`Finished Initialization success=${success}`)
         this.nodesLoaded = true;
         initializeCompleted();
         if (success) {
@@ -775,19 +776,15 @@ export class ISY {
     }
 
     public initializeWebSocket() {
-        const that = this;
+        const url = `${this.wsprotocol}://${this.address}/rest/subscribe`;
+        this.logger(`initializeWebSocket: ${url}`)
+
         const auth =
             'Basic ' +
             new Buffer(this.userName + ':' + this.password).toString('base64');
-        that.logger(
-            'Connecting to: ' +
-            this.wsprotocol +
-            '://' +
-            this.address +
-            '/rest/subscribe'
-        );
+
         this.webSocket = new Client(
-            `${this.wsprotocol}://${this.address}/rest/subscribe`,
+            url,
             ['ISYSUB'],
             {
                 headers: {
@@ -802,22 +799,22 @@ export class ISY {
 
         this.webSocket
             .on('message', (event) => {
-                that.handleWebSocketMessage(event);
+                this.handleWebSocketMessage(event);
             })
             .on('error', (err, response) => {
-                that.logger('Websocket subscription error: ' + err);
+                this.logger('Websocket subscription error: ' + err);
                 /// throw new Error('Error calling ISY' + err);
             })
             .on('fail', (data, response) => {
-                that.logger('Websocket subscription failure: ' + data);
+                this.logger('Websocket subscription failure: ' + data);
                 throw new Error('Failed calling ISY');
             })
             .on('abort', () => {
-                that.logger('Websocket subscription aborted.');
+                this.logger('Websocket subscription aborted.');
                 throw new Error('Call to ISY was aborted');
             })
             .on('timeout', (ms) => {
-                that.logger(
+                this.logger(
                     'Websocket subscription timed out after ' + ms + ' milliseconds.'
                 );
                 throw new Error('Timeout contacting ISY');
