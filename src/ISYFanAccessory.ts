@@ -75,15 +75,8 @@ export class ISYFanAccessory extends ISYDeviceAccessory<InsteonFanDevice> {
         }
     }
     public setPowerState(powerOn, callback) {
-        this.logger(`Setting powerstate to ${powerOn}`);
-        if (powerOn !== this.device.isOn) {
-            this.logger(`Changing powerstate to ${powerOn}`);
-            this.device
-                .updateIsOn(powerOn).handleWith(callback);
-        } else {
-            this.logger(`Ignoring redundant setPowerState`);
-            callback();
-        }
+        this.logger(`Changing powerstate to ${powerOn}`);
+        this.device.updateIsOn(powerOn).handleWith(callback);
     }
     // Handles request to get the current on state
     public getPowerState(callback) {
@@ -92,12 +85,7 @@ export class ISYFanAccessory extends ISYDeviceAccessory<InsteonFanDevice> {
     // Handles request to set the brightness level of dimmable lights. Ignore redundant commands.
     public setBrightness(level, callback) {
         this.logger(`Setting brightness to ${level}`);
-        if (level !== this.device.brightnessLevel) {
-            this.device.updateBrightnessLevel(level);
-        } else {
-            this.logger(`Ignoring redundant setBrightness`);
-            callback();
-        }
+        this.device.updateBrightnessLevel(level);
     }
     // Handles a request to get the current brightness level for dimmable lights.
     public getBrightness(callback) {

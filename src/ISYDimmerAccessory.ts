@@ -25,13 +25,7 @@ export class ISYDimmableAccessory<T extends InsteonDimmableDevice> extends ISYRe
     // Handles request to set the brightness level of dimmable lights. Ignore redundant commands.
     public setBrightness(level, callback) {
         this.logger(`Setting brightness to ${level}`);
-        if (level !== this.device.brightnessLevel) {
-            this.device
-                .updateBrightnessLevel(level).handleWith(callback);
-        } else {
-            this.logger(`Ignoring redundant setBrightness`);
-            callback();
-        }
+        this.device.updateBrightnessLevel(level).handleWith(callback);
     }
     // Handles a request to get the current brightness level for dimmable lights.
     public getBrightness(callback) {

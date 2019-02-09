@@ -12,13 +12,8 @@ export class ISYRelayAccessory<T extends InsteonRelayDevice> extends ISYDeviceAc
     // Handles the identify command
     // Handles request to set the current powerstate from homekit. Will ignore redundant commands.
     public setPowerState(powerOn: boolean, callback) {
-        if (powerOn !== this.device.isOn) {
-            this.device
-                .updateIsOn(powerOn).handleWith(callback);
-        } else {
-            this.logger(`Ignoring redundant setPowerState`);
-            callback();
-        }
+        this.logger(`Setting powerState=${powerOn}`);
+        this.device.updateIsOn(powerOn).handleWith(callback);
     }
     // Mirrors change in the state of the underlying isj-js device object.
     public handleExternalChange(propertyName, value, formattedValue) {
@@ -33,13 +28,7 @@ export class ISYRelayAccessory<T extends InsteonRelayDevice> extends ISYDeviceAc
     // Handles request to set the brightness level of dimmable lights. Ignore redundant commands.
     public setBrightness(level, callback) {
         this.logger(`Setting brightness to ${level}`);
-        if (level !== this.device.brightnessLevel) {
-            this.device
-                .updateBrightnessLevel(level).handleWith(callback);
-        } else {
-            this.logger(`Ignoring redundant setBrightness`);
-            callback();
-        }
+        this.device.updateBrightnessLevel(level).handleWith(callback);
     }
     // Handles a request to get the current brightness level for dimmable lights.
     public getBrightness(callback) {

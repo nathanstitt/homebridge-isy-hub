@@ -29,12 +29,7 @@ export class ISYSceneAccessory extends ISYAccessory<ISYScene> {
     }
     public setBrightness(level, callback) {
         this.logger(`Setting brightness to ${level}`);
-        if (level !== this.scene.brightnessLevel) {
-            this.scene.updateBrightnessLevel(level).handleWith(callback);
-        } else {
-            this.logger(`Ignoring redundant setBrightness`);
-            callback();
-        }
+        this.scene.updateBrightnessLevel(level).handleWith(callback);
     }
     // Handles a request to get the current brightness level for dimmable lights.
     public getBrightness(callback) {
@@ -57,7 +52,6 @@ export class ISYSceneAccessory extends ISYAccessory<ISYScene> {
 
         if (this.dimmable) {
             this.lightService = new Service.Lightbulb();
-
             this.lightService.addCharacteristic(Characteristic.Brightness).on('get', (f) => this.getBrightness(f)).on('set', (l, f) => this.setBrightness(l, f));
         } else {
             this.lightService = new Service.Switch();
