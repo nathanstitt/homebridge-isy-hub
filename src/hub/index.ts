@@ -197,8 +197,12 @@ export class ISY {
     public async callISY(url): Promise<any> {
         url = `${this.protocol}://${this.address}/rest/${url}/`;
         this.logger(`Sending request: ${url}`);
-        const p = await getAsync(url, this.restlerOptions);
-        return p;
+        try {
+            return await getAsync(url, this.restlerOptions);
+        } catch (e) {
+            console.warn(e)
+        }
+        return Promise.resolve();
     }
 
     private getDeviceTypeBasedOnISYTable(deviceNode) {
@@ -500,8 +504,11 @@ export class ISY {
     }
 
 
+    public isInitialized = false
 
     public finishInitialize(success, initializeCompleted) {
+        if (this.isInitialized) { return; }
+        this.isInitialized = true
         this.logger(`Finished Initialization success=${success}`)
         this.nodesLoaded = true;
         initializeCompleted();
