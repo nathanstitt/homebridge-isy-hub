@@ -19,13 +19,8 @@ export class ISYSceneAccessory extends ISYAccessory<ISYScene> {
     // Handles request to set the current powerstate from homekit. Will ignore redundant commands.
     public setPowerState(powerOn, callback) {
         this.logger(`Setting powerstate to ${powerOn}`);
-        if (this.scene.isOn !== powerOn) {
-            this.logger(`Changing powerstate to ${powerOn}`);
-            this.scene.updateIsOn(powerOn).handleWith(callback);
-        } else {
-            this.logger(`Ignoring redundant setPowerState`);
-            callback();
-        }
+        this.logger(`Changing powerstate to ${powerOn}`);
+        this.scene.updateIsOn(powerOn).handleWith(callback);
     }
     public setBrightness(level, callback) {
         this.logger(`Setting brightness to ${level}`);
